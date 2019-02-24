@@ -18,6 +18,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private Sensor accelerometer;
     private boolean activo;
 
+    /*
+        Cosas para probar
+    */
+    private double[] gravity = new double[3];
+    private double[] linear_acceleration = new double[3];
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +39,21 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
     @Override
     public void onSensorChanged(SensorEvent sensor) {
+        /*
         Log.d(TAG,"Datos del accelerometro: X: "+ sensor.values[0]+" - Y: "+sensor.values[1]+" - Z: "+sensor.values[2]);
+        */
+
+        double alpha = 0.8;
+        gravity[0] = alpha * gravity[0] + (1 - alpha) * sensor.values[0];
+        gravity[1] = alpha * gravity[1] + (1 - alpha) * sensor.values[1];
+        gravity[2] = alpha * gravity[2] + (1 - alpha) * sensor.values[2];
+
+        linear_acceleration[0] = sensor.values[0] - gravity[0];
+        linear_acceleration[1] = sensor.values[1] - gravity[1];
+        linear_acceleration[2] = sensor.values[2] - gravity[2];
+
+        Log.d(TAG,"Datos del accelerometro: X: "+ linear_acceleration[0]+" - Y: "+linear_acceleration[1]+" - Z: "+linear_acceleration[2]);
+
     }
 
     @Override
