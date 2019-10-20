@@ -22,7 +22,7 @@ for category in CATEGORIES:
             array_caidas = []
             for x in f1:
                 lista = list(map(float,x.split(";")))
-                #print(lista)
+                print(lista)
                 array_caidas.append(lista)
             #print(array_caidas)
             training_data.append([array_caidas,caida_tipo])

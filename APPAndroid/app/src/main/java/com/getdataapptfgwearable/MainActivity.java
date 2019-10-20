@@ -11,6 +11,13 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends WearableActivity implements SensorEventListener {
 
     private static final String TAG = "MainActivity";
@@ -22,7 +29,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         Cosas para probar
     */
     private double[] gravity = new double[3];
-    private double[] linear_acceleration = new double[3];
+    private float[] linear_acceleration = new float[3];
+    List<float[]> lst_linear_acc = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +56,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         gravity[1] = alpha * gravity[1] + (1 - alpha) * sensor.values[1];
         gravity[2] = alpha * gravity[2] + (1 - alpha) * sensor.values[2];
 
-        linear_acceleration[0] = sensor.values[0] - gravity[0];
-        linear_acceleration[1] = sensor.values[1] - gravity[1];
-        linear_acceleration[2] = sensor.values[2] - gravity[2];
+        linear_acceleration[0] = (float) (sensor.values[0] - gravity[0]);
+        linear_acceleration[1] = (float) (sensor.values[1] - gravity[1]);
+        linear_acceleration[2] = (float) (sensor.values[2] - gravity[2]);
 
         Log.d(TAG,"Datos del accelerometro: X: "+ linear_acceleration[0]+" - Y: "+linear_acceleration[1]+" - Z: "+linear_acceleration[2]);
+
+        //aqui vamos a añadir un linear acceleration a la lista
+        lst_linear_acc.add(linear_acceleration.clone());
 
     }
 
@@ -82,11 +93,39 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             activo = false;
             sensorManager.unregisterListener(this);
             Log.d(TAG,"Finalizando la lectura de datos");
+            Log.d(TAG,"Escribiendo en el fichero");
+            crearFichero();
+
         }else{
+
+            lst_linear_acc = new ArrayList<>();
             Log.d(TAG,"Empezando la lectura de datos");
             activo = true;
             sensorManager.registerListener(MainActivity.this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
         }
 
     }
+
+    private void crearFichero(){
+        Log.d(TAG,String.valueOf(lst_linear_acc.size()));
+
+       Log.d(TAG,getApplicationContext().getFilesDir().getPath());
+
+        File fichero = new File(getApplicationContext().getFilesDir(),"prueba1.txt");
+
+        try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
+            for(float[]a : lst_linear_acc ){
+
+                Log.d(TAG,"Datos del accelerometro: X: "+a[0]+" - Y: "+a[1]+" - Z: "+a[2]);
+                writer.write(a[0]+";"+a[1]+";"+a[2]+"\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 }
