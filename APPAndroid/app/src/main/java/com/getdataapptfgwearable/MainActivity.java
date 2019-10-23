@@ -24,6 +24,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private boolean activo;
+    private int contador;
 
     /*
         Cosas para probar
@@ -60,11 +61,16 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         linear_acceleration[1] = (float) (sensor.values[1] - gravity[1]);
         linear_acceleration[2] = (float) (sensor.values[2] - gravity[2]);
 
-        Log.d(TAG,"Datos del accelerometro: X: "+ linear_acceleration[0]+" - Y: "+linear_acceleration[1]+" - Z: "+linear_acceleration[2]);
+        Log.d(TAG,"Iteracion: "+contador+"Datos del accelerometro: X: "+ linear_acceleration[0]+" - Y: "+linear_acceleration[1]+" - Z: "+linear_acceleration[2]);
 
         //aqui vamos a añadir un linear acceleration a la lista
         lst_linear_acc.add(linear_acceleration.clone());
-
+        if(contador >= 1000){
+            crearFichero();
+            lst_linear_acc = new ArrayList<>();
+            contador =1;
+        }else{contador++;}
+        
     }
 
     @Override
@@ -87,22 +93,29 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         }
     }
 
-    public void onClickGetData(View view) {
+    public void onClickCaidaNo(View view) {
         if(activo){
             //sensor activo se apoaga
             activo = false;
             sensorManager.unregisterListener(this);
             Log.d(TAG,"Finalizando la lectura de datos");
             Log.d(TAG,"Escribiendo en el fichero");
-            crearFichero();
+
 
         }else{
 
             lst_linear_acc = new ArrayList<>();
             Log.d(TAG,"Empezando la lectura de datos");
             activo = true;
+            contador = 1;
             sensorManager.registerListener(MainActivity.this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
         }
+
+    }
+
+    public void onCLickCaidaSi(View view){
+
+
 
     }
 
@@ -119,6 +132,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
                 Log.d(TAG,"Datos del accelerometro: X: "+a[0]+" - Y: "+a[1]+" - Z: "+a[2]);
                 writer.write(a[0]+";"+a[1]+";"+a[2]+"\n");
+
             }
             writer.close();
         } catch (IOException e) {
