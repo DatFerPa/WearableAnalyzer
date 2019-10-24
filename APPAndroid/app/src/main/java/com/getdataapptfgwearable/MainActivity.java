@@ -25,7 +25,8 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private Sensor accelerometer;
     private boolean activo;
     private int contador;
-
+    private boolean caida;
+    private int iteracionesParaFichero = 1000;
     /*
         Cosas para probar
     */
@@ -65,12 +66,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         //aqui vamos a añadir un linear acceleration a la lista
         lst_linear_acc.add(linear_acceleration.clone());
-        if(contador >= 1000){
-            crearFichero();
+        if(!caida && contador >= iteracionesParaFichero){
+            crearFicheroCaidaNo();
             lst_linear_acc = new ArrayList<>();
             contador =1;
         }else{contador++;}
-        
+
     }
 
     @Override
@@ -94,19 +95,24 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     }
 
     public void onClickCaidaNo(View view) {
+        /*
+            La idea es ir haciendo lecturas de 1000 en 1000 (por ejemplo), y asi una vez se hagan 1000 lecturas,
+            guardamos un fichero
+         */
         if(activo){
             //sensor activo se apoaga
             activo = false;
             sensorManager.unregisterListener(this);
-            Log.d(TAG,"Finalizando la lectura de datos");
-            Log.d(TAG,"Escribiendo en el fichero");
+            Log.d(TAG,"Finalizando la lectura de datos no caida");
+
 
 
         }else{
 
             lst_linear_acc = new ArrayList<>();
-            Log.d(TAG,"Empezando la lectura de datos");
+            Log.d(TAG,"Empezando la lectura de datos no caida");
             activo = true;
+            caida = false;
             contador = 1;
             sensorManager.registerListener(MainActivity.this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
         }
@@ -114,17 +120,59 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     }
 
     public void onCLickCaidaSi(View view){
+        /*
+            Mi idea es que demos al boton de caida si, es que se empieze a hacer el registro de los datos
+            una vez le demos otra vez al boton, dejaremos de hacer el registro de datos y cojeremos los ultimos x valores para hacer
+            el fichero de la caida.
+            problemas:
+                quiza la cantidad de datos sean pocos por ficheros.
+                problema a que quiza no se recoja bien toda la curva de la caida
+         */
+        if(activo){
+            crearFicheroCaidaSi();
+            activo = false;
+            sensorManager.unregisterListener(this);
+            Log.d(TAG,"Finalizando la lectura de datos si caida");
 
-
+        }else{
+            lst_linear_acc = new ArrayList<>();
+            Log.d(TAG,"Empezando la lectura de datos si caida");
+            activo = true;
+            caida = true;
+            contador = 1;
+            sensorManager.registerListener(MainActivity.this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
+        }
 
     }
 
-    private void crearFichero(){
+    private void crearFicheroCaidaSi() {
+        Log.d(TAG,String.valueOf(lst_linear_acc.size()));
+
+        Log.d(TAG,getApplicationContext().getFilesDir().getPath());
+
+        File fichero = new File(getApplicationContext().getFilesDir(),"caidasi"+System.currentTimeMillis()+".txt");
+
+        try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
+            for(int i = lst_linear_acc.size()-1;i>=lst_linear_acc.size()-iteracionesParaFichero;i--){
+                float[] datoConcreto = lst_linear_acc.get(i);
+                Log.d(TAG,"Datos del accelerometro: X: "+datoConcreto[0]+" - Y: "+datoConcreto[1]+" - Z: "+datoConcreto[2]);
+                writer.write(datoConcreto[0]+";"+datoConcreto[1]+";"+datoConcreto[2]+"\n");
+
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void crearFicheroCaidaNo(){
         Log.d(TAG,String.valueOf(lst_linear_acc.size()));
 
        Log.d(TAG,getApplicationContext().getFilesDir().getPath());
 
-        File fichero = new File(getApplicationContext().getFilesDir(),"prueba1.txt");
+        File fichero = new File(getApplicationContext().getFilesDir(),"caidano"+System.currentTimeMillis()+".txt");
 
         try{
             BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
