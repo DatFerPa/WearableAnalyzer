@@ -154,6 +154,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     }
 
     private void crearFicheroCaidaSi() {
+        /*
+            ¿Que pasa si el numero de datos es menor? -> Tengo que añadir mas datos por detras al array
+         */
         Log.d(TAG,String.valueOf(lst_linear_acc.size()));
 
         Log.d(TAG,getApplicationContext().getFilesDir().getPath());
@@ -162,7 +165,10 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         try{
             BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-            for(int i = lst_linear_acc.size()-1;i>=lst_linear_acc.size()-iteracionesParaFichero;i--){
+            //al reves
+            //int i = lst_linear_acc.size()-1;i>=lst_linear_acc.size()-iteracionesParaFichero;i--
+            for(int i = lst_linear_acc.size()-iteracionesParaFichero;i<=lst_linear_acc.size()-1;i++){
+
                 float[] datoConcreto = lst_linear_acc.get(i);
                 Log.d(TAG,"Datos del accelerometro: X: "+datoConcreto[0]+" - Y: "+datoConcreto[1]+" - Z: "+datoConcreto[2]);
                 writer.write(datoConcreto[0]+";"+datoConcreto[1]+";"+datoConcreto[2]+"\n");
@@ -181,12 +187,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
        Log.d(TAG,getApplicationContext().getFilesDir().getPath());
 
         File fichero = new File(getApplicationContext().getFilesDir(),"caidano"+System.currentTimeMillis()+".txt");
-
+        Log.d(TAG,"Guardando fichero de No caida");
         try{
             BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
             for(float[]a : lst_linear_acc ){
 
-                Log.d(TAG,"Datos del accelerometro: X: "+a[0]+" - Y: "+a[1]+" - Z: "+a[2]);
+                //Log.d(TAG,"Datos del accelerometro para fichero de no caida: X: "+a[0]+" - Y: "+a[1]+" - Z: "+a[2]);
                 writer.write(a[0]+";"+a[1]+";"+a[2]+"\n");
 
             }
