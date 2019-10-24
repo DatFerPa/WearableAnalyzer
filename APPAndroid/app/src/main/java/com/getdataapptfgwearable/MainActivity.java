@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.BufferedWriter;
@@ -33,6 +34,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     private double[] gravity = new double[3];
     private float[] linear_acceleration = new float[3];
     List<float[]> lst_linear_acc = new ArrayList<>();
+    private Button botonSi;
+    private Button botonNo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,9 @@ public class MainActivity extends WearableActivity implements SensorEventListene
 
         // Enables Always-on
         setAmbientEnabled();
+
+        botonSi = (Button) findViewById(R.id.buttonCaidaSI);
+        botonNo = (Button) findViewById(R.id.buttonCaidaNo);
     }
 
     @Override
@@ -104,9 +111,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             activo = false;
             sensorManager.unregisterListener(this);
             Log.d(TAG,"Finalizando la lectura de datos no caida");
-
-
-
+            botonSi.setVisibility(View.VISIBLE);
         }else{
 
             lst_linear_acc = new ArrayList<>();
@@ -114,6 +119,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             activo = true;
             caida = false;
             contador = 1;
+            botonSi.setVisibility(View.INVISIBLE);
             sensorManager.registerListener(MainActivity.this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
         }
 
@@ -133,6 +139,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             activo = false;
             sensorManager.unregisterListener(this);
             Log.d(TAG,"Finalizando la lectura de datos si caida");
+            botonNo.setVisibility(View.VISIBLE);
 
         }else{
             lst_linear_acc = new ArrayList<>();
@@ -140,6 +147,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             activo = true;
             caida = true;
             contador = 1;
+            botonNo.setVisibility(View.INVISIBLE);
             sensorManager.registerListener(MainActivity.this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
         }
 
