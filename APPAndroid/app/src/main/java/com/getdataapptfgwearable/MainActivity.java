@@ -1,6 +1,7 @@
 package com.getdataapptfgwearable;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.getdataapptfgwearable.service.ServiceSensorCaidaNo;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -19,23 +22,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends WearableActivity implements SensorEventListener {
+public class MainActivity extends WearableActivity  {
 
     private static final String TAG = "MainActivity";
-    private SensorManager sensorManager;
-    private Sensor accelerometer;
-    private boolean activo;
-    private int contador;
-    private boolean caida;
+
     private int iteracionesParaFichero = 1000;
     /*
         Cosas para probar
     */
-    private double[] gravity = new double[3];
-    private float[] linear_acceleration = new float[3];
-    List<float[]> lst_linear_acc = new ArrayList<>();
+
+
+    private boolean activo;
     private Button botonSi;
     private Button botonNo;
+    private Intent intent;
 
 
     @Override
@@ -44,8 +44,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         setContentView(R.layout.activity_main);
 
         //inicializacion del sensor
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
 
         // Enables Always-on
         setAmbientEnabled();
@@ -53,12 +52,12 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         botonSi = (Button) findViewById(R.id.buttonCaidaSI);
         botonNo = (Button) findViewById(R.id.buttonCaidaNo);
     }
-
+/*
     @Override
     public void onSensorChanged(SensorEvent sensor) {
-        /*
-        Log.d(TAG,"Datos del accelerometro: X: "+ sensor.values[0]+" - Y: "+sensor.values[1]+" - Z: "+sensor.values[2]);
-        */
+
+        //Log.d(TAG,"Datos del accelerometro: X: "+ sensor.values[0]+" - Y: "+sensor.values[1]+" - Z: "+sensor.values[2]);
+
 
         double alpha = 0.8;
         gravity[0] = alpha * gravity[0] + (1 - alpha) * sensor.values[0];
@@ -85,7 +84,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     public void onAccuracyChanged(Sensor sensor, int i) {
 
     }
-
+*/
     @Override
     protected void onResume() {
         super.onResume();
@@ -95,10 +94,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
     @Override
     protected void onPause() {
         super.onPause();
-        if(activo){
-            activo = false;
-            sensorManager.unregisterListener(this);
-        }
+
     }
 
     public void onClickCaidaNo(View view) {
@@ -106,6 +102,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             La idea es ir haciendo lecturas de 1000 en 1000 (por ejemplo), y asi una vez se hagan 1000 lecturas,
             guardamos un fichero
          */
+      /*
         if(activo){
             //sensor activo se apoaga
             activo = false;
@@ -122,6 +119,19 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             botonSi.setVisibility(View.INVISIBLE);
             sensorManager.registerListener(MainActivity.this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
         }
+*/
+      if(activo){
+          Log.d(TAG,"Finalizando la lectura de datos no caida");
+          activo = false;
+          botonSi.setVisibility(View.VISIBLE);
+          stopService(intent);
+      }else{
+          Log.d(TAG,"Empezando la lectura de datos no caida");
+          activo=true;
+          botonSi.setVisibility(View.INVISIBLE);
+          intent = new Intent(this, ServiceSensorCaidaNo.class);
+          startService(intent);
+      }
 
     }
 
@@ -134,6 +144,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
                 quiza la cantidad de datos sean pocos por ficheros.
                 problema a que quiza no se recoja bien toda la curva de la caida
          */
+        /*
         if(activo){
             crearFicheroCaidaSi();
             activo = false;
@@ -150,19 +161,20 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             botonNo.setVisibility(View.INVISIBLE);
             sensorManager.registerListener(MainActivity.this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL);
         }
-
+*/
     }
 
     private void crearFicheroCaidaSi() {
         /*
             ¿Que pasa si el numero de datos es menor? -> Tengo que añadir mas datos por detras al array
          */
+/*
         Log.d(TAG,String.valueOf(lst_linear_acc.size()));
 
         Log.d(TAG,getApplicationContext().getFilesDir().getPath());
 
         File fichero = new File(getApplicationContext().getFilesDir(),"caidasi"+System.currentTimeMillis()+".txt");
-
+        Log.d(TAG,"Guardando fichero de Si caida");
         try{
             BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
             //al reves
@@ -170,7 +182,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
             for(int i = lst_linear_acc.size()-iteracionesParaFichero;i<=lst_linear_acc.size()-1;i++){
 
                 float[] datoConcreto = lst_linear_acc.get(i);
-                Log.d(TAG,"Datos del accelerometro: X: "+datoConcreto[0]+" - Y: "+datoConcreto[1]+" - Z: "+datoConcreto[2]);
+                //Log.d(TAG,"Datos del accelerometro: X: "+datoConcreto[0]+" - Y: "+datoConcreto[1]+" - Z: "+datoConcreto[2]);
                 writer.write(datoConcreto[0]+";"+datoConcreto[1]+";"+datoConcreto[2]+"\n");
 
             }
@@ -178,13 +190,14 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+*/
     }
 
     private void crearFicheroCaidaNo(){
+        /*
         Log.d(TAG,String.valueOf(lst_linear_acc.size()));
 
-       Log.d(TAG,getApplicationContext().getFilesDir().getPath());
+        Log.d(TAG,getApplicationContext().getFilesDir().getPath());
 
         File fichero = new File(getApplicationContext().getFilesDir(),"caidano"+System.currentTimeMillis()+".txt");
         Log.d(TAG,"Guardando fichero de No caida");
@@ -200,7 +213,7 @@ public class MainActivity extends WearableActivity implements SensorEventListene
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+*/
     }
 
 

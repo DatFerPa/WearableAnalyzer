@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.getdataapptfgwearable">
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-feature android:name="android.hardware.type.watch" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -12,6 +14,15 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
+        <service
+            android:name=".service.ServiceSensorCaidaSi"
+            android:enabled="true"
+            android:exported="true"></service>
+        <service
+            android:name=".service.ServiceSensorCaidaNo"
+            android:enabled="true"
+            android:exported="true" />
+
         <uses-library
             android:name="com.google.android.wearable"
             android:required="true" />
