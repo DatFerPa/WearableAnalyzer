@@ -87,7 +87,7 @@ public class ServiceSensorCaidaNo extends Service implements SensorEventListener
 
     @Override
     public void onDestroy() {
-        Log.d(TAG,"Finalizando servicio");
+        Log.d(TAG,"Finalizando servicio caida no");
         sensorManager.unregisterListener(this);
         super.onDestroy();
     }
