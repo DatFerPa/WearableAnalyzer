@@ -43,7 +43,7 @@ public class MainActivity extends WearableActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         setAmbientEnabled();
 
         botonSi = (Button) findViewById(R.id.buttonCaidaSI);
