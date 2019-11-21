@@ -3,6 +3,8 @@
     package="com.detectorcaidas">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+
 
     <uses-feature android:name="android.hardware.type.watch" />
 
