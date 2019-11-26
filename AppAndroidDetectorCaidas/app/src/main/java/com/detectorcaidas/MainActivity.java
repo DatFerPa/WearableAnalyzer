@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
+import android.util.Log;
+
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
 
 
@@ -33,8 +35,12 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     @Override
     public void onItemSelected(int pos) {
+        Log.d(TAG,"Cambio de pestaña de navigation drawer");
+        //aqui vamos a poner lo que tiene que cambiar en el linear layout
 
     }
+
+
 
     private final class NavigationAdapter extends WearableNavigationDrawerAdapter {
 
@@ -51,7 +57,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         @Override
         public Drawable getItemDrawable(int pos) {
-            return null;
+            return context.getDrawable(getResources().getIdentifier("settings", "drawable", getPackageName()));
         }
 
         @Override
