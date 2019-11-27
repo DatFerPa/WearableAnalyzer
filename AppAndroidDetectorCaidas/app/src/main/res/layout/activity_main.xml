@@ -15,19 +15,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ScrollView
-            android:id="@+id/content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:nestedScrollingEnabled="true">
+        <include
+            layout="@layout/layout_inicio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-            <FrameLayout
-                android:id="@+id/fragmentLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </FrameLayout>
-        </ScrollView>
+        <include
+            layout="@layout/layout_ajustes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:visibility="invisible" />
 
         <androidx.wear.widget.drawer.WearableNavigationDrawerView
             android:id="@+id/top_navigation_drawer"
@@ -36,5 +33,6 @@
             app:navigationStyle="multiPage" >
 
         </androidx.wear.widget.drawer.WearableNavigationDrawerView>
+
     </androidx.wear.widget.drawer.WearableDrawerLayout>
 </androidx.wear.widget.BoxInsetLayout>

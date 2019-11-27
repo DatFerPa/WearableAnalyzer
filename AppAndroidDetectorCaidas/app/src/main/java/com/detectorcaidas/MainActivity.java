@@ -7,8 +7,6 @@ import android.os.Bundle;
 
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
-
-import com.detectorcaidas.fragments.Fragment_inicio;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView;
 
@@ -30,18 +28,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         top_navigation_drawer.getController().peekDrawer();
         top_navigation_drawer.addOnItemSelectedListener(this);
         // Enables Always-on
-
-
-        Fragment_inicio fgInicio = new Fragment_inicio();
-        Bundle args = new Bundle();
-        int imageId = getResources().getIdentifier("walkingicon",
-                "drawable", getPackageName());
-
-        args.putInt(Fragment_inicio.ARG_FRAG_INICIO, imageId);
-        fgInicio.setArguments(args);
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.fragmentLayout,fgInicio).commit();
-
 
         setAmbientEnabled();
     }
