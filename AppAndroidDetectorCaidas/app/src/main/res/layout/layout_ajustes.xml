@@ -20,10 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="top|center"
-            android:onClick="click"
             android:text="@string/ajustes_info"
-            tools:text="@string/ajustes_info"
-            />
+            tools:text="@string/ajustes_info" />
 
         <TextView
             android:id="@+id/numeroTelefContacto"
@@ -31,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:onClick="clickModificarContacto"
-            android:text="+34648738746"
+            android:text="aaa"
             android:textStyle="bold" />
 
         <TextView
@@ -41,7 +39,6 @@
             android:layout_gravity="bottom|center"
             android:onClick="clickModificarContacto"
             android:paddingBottom="40dp"
-            android:text="Fernando Palazuelo ..."
             android:textStyle="bold" />
 
     </FrameLayout>

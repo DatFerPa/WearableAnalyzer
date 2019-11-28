@@ -1,9 +1,9 @@
 package com.detectorcaidas;
 
 import android.Manifest;
-import android.app.FragmentManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -11,10 +11,8 @@ import android.os.Bundle;
 
 import android.provider.ContactsContract;
 import android.support.wearable.activity.WearableActivity;
-import android.text.Layout;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import androidx.core.content.ContextCompat;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
@@ -25,7 +23,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private static final String TAG = "MainActivity";
 
     private WearableNavigationDrawerView top_navigation_drawer;
-    private String[] arrayViews = {"Inicio","Ajustes"} ;
+    private String[] arrayViews = {"Inicio", "Ajustes"};
 
     private View layoutInicio;
     private View layoutAjustes;
@@ -41,7 +39,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         top_navigation_drawer.addOnItemSelectedListener(this);
         // Enables Always-on
 
-        layoutAjustes =  findViewById(R.id.layout_base_ajustes);
+        layoutAjustes = findViewById(R.id.layout_base_ajustes);
         layoutInicio = findViewById(R.id.layout_base_incio);
         layoutInicio.setVisibility(View.VISIBLE);
         layoutAjustes.setVisibility(View.INVISIBLE);
@@ -52,11 +50,11 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     @Override
     public void onItemSelected(int pos) {
 
-        Log.d(TAG,"Cambio de pestaña de navigation drawer");
-        if(pos == 0){
+        Log.d(TAG, "Cambio de pestaña de navigation drawer");
+        if (pos == 0) {
             layoutInicio.setVisibility(View.VISIBLE);
             layoutAjustes.setVisibility(View.INVISIBLE);
-        }else{
+        } else {
             layoutInicio.setVisibility(View.INVISIBLE);
             layoutAjustes.setVisibility(View.VISIBLE);
         }
@@ -65,12 +63,15 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
 
     public void clickButtonInicio(View view) {
-        Log.d(TAG,"Click al boton");
+        Log.d(TAG, "Click al boton");
     }
 
 
     public void clickModificarContacto(View view) {
-        Log.d(TAG,"Click qui ti click");
+        Log.d(TAG, "Click qui ti click");
+        Intent intent = new Intent(this, ListContactsActivity.class);
+        startActivity(intent);
+
     }
 
 
@@ -78,7 +79,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         private final Context context;
 
-        NavigationAdapter(Context context){
+        NavigationAdapter(Context context) {
             this.context = context;
         }
 
@@ -89,7 +90,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         @Override
         public Drawable getItemDrawable(int pos) {
-            return  (pos == 0)? context.getDrawable(getResources().getIdentifier("walkingicon", "drawable", getPackageName())):context.getDrawable(getResources().getIdentifier("settings", "drawable", getPackageName()));
+            return (pos == 0) ? context.getDrawable(getResources().getIdentifier("walkingicon", "drawable", getPackageName())) : context.getDrawable(getResources().getIdentifier("settings", "drawable", getPackageName()));
         }
 
         @Override
@@ -103,8 +104,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     /*
         Tengo que tener un metod
      */
-
-
 
 
     private void getContactList() {
