@@ -69,7 +69,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
 
-    public void click(View view) {
+    public void clickModificarContacto(View view) {
         Log.d(TAG,"Click qui ti click");
     }
 
