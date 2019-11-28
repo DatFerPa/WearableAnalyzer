@@ -5,22 +5,20 @@
     android:id="@+id/layout_base_ajustes"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="15dp"
-    tools:visibility="visible">
+    android:padding="15dp">
 
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp"
-
-        >
+        android:padding="25dp">
 
         <TextView
             android:id="@+id/textViewTextoAjustes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:onClick="click"
             android:text="@string/ajustes_info"
             tools:text="@string/ajustes_info" />
 

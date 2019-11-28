@@ -23,8 +23,7 @@
         <include
             layout="@layout/layout_ajustes"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:visibility="invisible" />
+            android:layout_height="wrap_content" />
 
         <androidx.wear.widget.drawer.WearableNavigationDrawerView
             android:id="@+id/top_navigation_drawer"

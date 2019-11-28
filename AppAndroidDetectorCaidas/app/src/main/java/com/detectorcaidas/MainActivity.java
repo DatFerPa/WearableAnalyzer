@@ -37,12 +37,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         top_navigation_drawer = findViewById(R.id.top_navigation_drawer);
         top_navigation_drawer.setAdapter(new NavigationAdapter(this));
-        layoutAjustes =  findViewById(R.id.layout_base_ajustes);
-        layoutInicio = findViewById(R.id.layout_base_incio);
         top_navigation_drawer.getController().peekDrawer();
         top_navigation_drawer.addOnItemSelectedListener(this);
         // Enables Always-on
 
+        layoutAjustes =  findViewById(R.id.layout_base_ajustes);
+        layoutInicio = findViewById(R.id.layout_base_incio);
+        layoutInicio.setVisibility(View.VISIBLE);
+        layoutAjustes.setVisibility(View.INVISIBLE);
         setAmbientEnabled();
     }
 
@@ -64,6 +66,11 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     public void clickButtonInicio(View view) {
         Log.d(TAG,"Click al boton");
+    }
+
+
+    public void click(View view) {
+        Log.d(TAG,"Click qui ti click");
     }
 
 
