@@ -11,8 +11,10 @@ import android.os.Bundle;
 
 import android.provider.ContactsContract;
 import android.support.wearable.activity.WearableActivity;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.core.content.ContextCompat;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
@@ -24,6 +26,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     private WearableNavigationDrawerView top_navigation_drawer;
     private String[] arrayViews = {"Inicio","Ajustes"} ;
+
+    private View layoutInicio;
+    private View layoutAjustes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,8 +37,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         top_navigation_drawer = findViewById(R.id.top_navigation_drawer);
         top_navigation_drawer.setAdapter(new NavigationAdapter(this));
-
-
+        layoutAjustes =  findViewById(R.id.layout_base_ajustes);
+        layoutInicio = findViewById(R.id.layout_base_incio);
         top_navigation_drawer.getController().peekDrawer();
         top_navigation_drawer.addOnItemSelectedListener(this);
         // Enables Always-on
@@ -43,15 +49,21 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     @Override
     public void onItemSelected(int pos) {
+
         Log.d(TAG,"Cambio de pestaña de navigation drawer");
-        //aqui vamos a poner lo que tiene que cambiar en el linear layout
+        if(pos == 0){
+            layoutInicio.setVisibility(View.VISIBLE);
+            layoutAjustes.setVisibility(View.INVISIBLE);
+        }else{
+            layoutInicio.setVisibility(View.INVISIBLE);
+            layoutAjustes.setVisibility(View.VISIBLE);
+        }
 
     }
 
-    public void onCLickLayoutInicio(View view) {
 
-        getContactList();
-
+    public void clickButtonInicio(View view) {
+        Log.d(TAG,"Click al boton");
     }
 
 
@@ -70,7 +82,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         @Override
         public Drawable getItemDrawable(int pos) {
-            return context.getDrawable(getResources().getIdentifier("settings", "drawable", getPackageName()));
+            return  (pos == 0)? context.getDrawable(getResources().getIdentifier("walkingicon", "drawable", getPackageName())):context.getDrawable(getResources().getIdentifier("settings", "drawable", getPackageName()));
         }
 
         @Override
@@ -80,6 +92,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
 
+
+    /*
+        Tengo que tener un metod
+     */
 
 
 
