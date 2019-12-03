@@ -30,13 +30,17 @@ public class ContactLister {
 
         Cursor phones = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,null,null, null);
         // use the cursor to access the contacts
+        String oldphoneNumber = "-1";
         while (phones.moveToNext()){
             String name=phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             // get display name
             String phoneNumber = phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
             // get phone number
-            contactos.add(new Contacto(name,phoneNumber));
-            Log.d(TAG,name+".................."+phoneNumber);
+            if(!phoneNumber.equals(oldphoneNumber)) {
+                contactos.add(new Contacto(name, phoneNumber));
+            }
+            oldphoneNumber = phoneNumber;
+            //Log.d(TAG,name+".................."+phoneNumber);
         }
     }
 

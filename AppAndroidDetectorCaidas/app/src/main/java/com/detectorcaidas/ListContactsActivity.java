@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
+import android.util.Log;
 import android.view.View;
 
 import com.detectorcaidas.recycle.Contacto;
@@ -20,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableLinearLayoutManager;
 import androidx.wear.widget.WearableRecyclerView;
 
-public class ListContactsActivity extends WearableActivity {
+public class ListContactsActivity  extends WearableActivity implements ContactoAdapter.OnClickListenerContactos{
 
     private static final String TAG = "ListContactActivity";
 
@@ -33,18 +34,24 @@ public class ListContactsActivity extends WearableActivity {
         setContentView(R.layout.layout_list_contacts);
         contactos = new ArrayList<>();
         getContactList();
-        /*
+
         wrView = findViewById(R.id.recycler_view_contactos);
         wrView.setHasFixedSize(true);
         wrView.setEdgeItemsCenteringEnabled(true);
         CustomScrollingLayoutCallback customScrollingLayoutCallback = new CustomScrollingLayoutCallback();
         wrView.setLayoutManager(new WearableLinearLayoutManager(this,customScrollingLayoutCallback));
         // wrView.setLayoutManager(new WearableLinearLayoutManager(this));
-        contactoAdapter = new ContactoAdapter(contactos);
+        contactoAdapter = new ContactoAdapter(contactos,this);
         wrView.setAdapter(contactoAdapter);
-        */
+
 
     }
+
+    @Override
+    public void onClickElemento(int position) {
+        Log.d(TAG,"click en:"+contactos.get(position).getNombre()+" ----- "+contactos.get(position).getTelefono());
+    }
+
 
     public class CustomScrollingLayoutCallback extends WearableLinearLayoutManager.LayoutCallback {
         /** How much should we scale the icon at most. */
@@ -81,7 +88,7 @@ public class ListContactsActivity extends WearableActivity {
             ContentResolver cr = getContentResolver();
             ContactLister contactLister = new ContactLister();
             contactLister.getListaDeContactos(cr);
-            contactLister.getContactos();
+            contactos = contactLister.getContactos();
         }
     }
 }
