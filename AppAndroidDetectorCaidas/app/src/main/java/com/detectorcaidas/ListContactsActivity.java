@@ -3,6 +3,8 @@ package com.detectorcaidas;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
@@ -44,15 +46,19 @@ public class ListContactsActivity extends WearableActivity implements ContactoAd
         // wrView.setLayoutManager(new WearableLinearLayoutManager(this));
         contactoAdapter = new ContactoAdapter(contactos, this);
         wrView.setAdapter(contactoAdapter);
-
-
     }
+
 
     @Override
     public void onClickElemento(int position) {
 
         Log.d(TAG, "click en:" + contactos.get(position).getNombre() + " ----- " + contactos.get(position).getTelefono());
-
+        SharedPreferences sharedPreferences = this.getSharedPreferences(
+                getString(R.string.ID_SHARED_PREFERENCES), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getString(R.string.shared_nombre_contacto),contactos.get(position).getNombre());
+        editor.putString(getString(R.string.shared_telefono_contacto),contactos.get(position).getTelefono());
+        editor.commit();
         finish();
     }
 

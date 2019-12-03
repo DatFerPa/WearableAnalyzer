@@ -32,8 +32,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         top_navigation_drawer = findViewById(R.id.top_navigation_drawer);
         top_navigation_drawer.setAdapter(new NavigationAdapter(this));
         top_navigation_drawer.getController().peekDrawer();
@@ -51,6 +49,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         setAmbientEnabled();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences = this.getSharedPreferences(
+                getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
+        telefonoTextView.setText(sharedPreferences.getString(getString(R.string.shared_telefono_contacto),getString(R.string.contactoDefecto)));
+        contactoTextView.setText(sharedPreferences.getString(getString(R.string.shared_nombre_contacto),getString(R.string.telefonoDefecto)));
+    }
 
     private  void getInfoContact(){
         SharedPreferences sharedPreferences = this.getSharedPreferences(
