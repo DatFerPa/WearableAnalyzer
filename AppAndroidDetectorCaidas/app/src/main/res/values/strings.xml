@@ -13,4 +13,12 @@
     <string name="ajustes_info">Este es su número de contacto</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="ID_SHARED_PREFERENCES">ANDROID_CAIDAS_SHARED_PREFERENCES</string>
+    <string name="shared_nombre_contacto">NombreContacto</string>
+    <string name="shared_telefono_contacto">TelefonoContacto</string>
+
+    <string name="contactoDefecto">Fernando</string>
+    <string name="telefonoDefecto">648738746</string>
+
+
 </resources>

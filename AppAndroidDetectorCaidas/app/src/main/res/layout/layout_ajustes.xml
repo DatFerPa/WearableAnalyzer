@@ -29,7 +29,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:onClick="clickModificarContacto"
-            android:text="aaa"
             android:textStyle="bold" />
 
         <TextView

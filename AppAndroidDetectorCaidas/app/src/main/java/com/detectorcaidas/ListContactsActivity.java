@@ -21,13 +21,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableLinearLayoutManager;
 import androidx.wear.widget.WearableRecyclerView;
 
-public class ListContactsActivity  extends WearableActivity implements ContactoAdapter.OnClickListenerContactos{
+public class ListContactsActivity extends WearableActivity implements ContactoAdapter.OnClickListenerContactos {
 
     private static final String TAG = "ListContactActivity";
 
     private WearableRecyclerView wrView;
     private ContactoAdapter contactoAdapter;
     private List<Contacto> contactos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,9 +40,9 @@ public class ListContactsActivity  extends WearableActivity implements ContactoA
         wrView.setHasFixedSize(true);
         wrView.setEdgeItemsCenteringEnabled(true);
         CustomScrollingLayoutCallback customScrollingLayoutCallback = new CustomScrollingLayoutCallback();
-        wrView.setLayoutManager(new WearableLinearLayoutManager(this,customScrollingLayoutCallback));
+        wrView.setLayoutManager(new WearableLinearLayoutManager(this, customScrollingLayoutCallback));
         // wrView.setLayoutManager(new WearableLinearLayoutManager(this));
-        contactoAdapter = new ContactoAdapter(contactos,this);
+        contactoAdapter = new ContactoAdapter(contactos, this);
         wrView.setAdapter(contactoAdapter);
 
 
@@ -49,12 +50,32 @@ public class ListContactsActivity  extends WearableActivity implements ContactoA
 
     @Override
     public void onClickElemento(int position) {
-        Log.d(TAG,"click en:"+contactos.get(position).getNombre()+" ----- "+contactos.get(position).getTelefono());
+
+        Log.d(TAG, "click en:" + contactos.get(position).getNombre() + " ----- " + contactos.get(position).getTelefono());
+
+        finish();
     }
 
+    public void getContactList() {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+            String[] permisos = {Manifest.permission.READ_CONTACTS};
+            requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
+
+        } else {
+
+            ContentResolver cr = getContentResolver();
+            ContactLister contactLister = new ContactLister();
+            contactLister.getListaDeContactos(cr);
+            contactos = contactLister.getContactos();
+        }
+    }
 
     public class CustomScrollingLayoutCallback extends WearableLinearLayoutManager.LayoutCallback {
-        /** How much should we scale the icon at most. */
+        /**
+         * How much should we scale the icon at most.
+         */
         private static final float MAX_ICON_PROGRESS = 0.65f;
         private float progressToCenter;
 
@@ -72,23 +93,6 @@ public class ListContactsActivity  extends WearableActivity implements ContactoA
 
             child.setScaleX(1 - progressToCenter);
             child.setScaleY(1 - progressToCenter);
-        }
-    }
-
-
-    public  void getContactList() {
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
-            String[] permisos = {Manifest.permission.READ_CONTACTS};
-            requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
-
-        } else {
-
-            ContentResolver cr = getContentResolver();
-            ContactLister contactLister = new ContactLister();
-            contactLister.getListaDeContactos(cr);
-            contactos = contactLister.getContactos();
         }
     }
 }
