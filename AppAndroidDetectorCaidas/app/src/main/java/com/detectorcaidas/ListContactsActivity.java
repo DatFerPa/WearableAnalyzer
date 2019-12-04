@@ -10,14 +10,11 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
-
 import com.detectorcaidas.recycle.Contacto;
 import com.detectorcaidas.recycle.ContactoAdapter;
 import com.detectorcaidas.utils.ContactLister;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableLinearLayoutManager;
@@ -68,7 +65,6 @@ public class ListContactsActivity extends WearableActivity implements ContactoAd
                 != PackageManager.PERMISSION_GRANTED) {
             String[] permisos = {Manifest.permission.READ_CONTACTS};
             requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
-
         } else {
 
             ContentResolver cr = getContentResolver();
