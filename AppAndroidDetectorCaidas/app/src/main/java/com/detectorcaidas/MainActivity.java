@@ -70,10 +70,13 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                 ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED &&
         ContextCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED) {
+                != PackageManager.PERMISSION_GRANTED  &&
+                ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
+                        != PackageManager.PERMISSION_GRANTED ) {
+
 
             String[] permisos = {Manifest.permission.READ_CONTACTS,Manifest.permission.SEND_SMS,
-                    Manifest.permission.CALL_PHONE};
+                    Manifest.permission.CALL_PHONE,Manifest.permission.READ_PHONE_STATE};
             requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
         }
     }
@@ -112,14 +115,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     public void clickButtonInicio(View view) {
         Log.d(TAG, "Click de inicio");
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage("648738746", null,
-                    "textito de prueba", null, null);
-        }catch (UnsupportedOperationException ex){
-            Toast.makeText(this,getText(R.string.notsupportsms),Toast.LENGTH_LONG).show();
-        }
-        Log.d(TAG, "He lleagado aqui");
+
+        Log.d(TAG, "Empezando llamada");
         Intent callIntent = new Intent(Intent.ACTION_CALL);
         callIntent.setData(Uri.parse("tel:648738746"));
         if (ContextCompat.checkSelfPermission(MainActivity.this,
@@ -128,6 +125,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
         }
         startActivity(callIntent);
+
     }
 
 
