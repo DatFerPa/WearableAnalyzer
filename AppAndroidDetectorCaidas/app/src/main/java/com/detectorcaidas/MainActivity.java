@@ -10,22 +10,23 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
-import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
-
+import com.detectorcaidas.services.ServiceFallingSensor;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView;
 
 public class MainActivity extends WearableActivity implements WearableNavigationDrawerView.OnItemSelectedListener {
 
     private static final String TAG = "MainActivity";
-
+    private boolean caidaBool = false;
     private WearableNavigationDrawerView top_navigation_drawer;
     private String[] arrayViews = {"Inicio", "Ajustes"};
+    private ImageButton botonInicio;
 
     private View layoutInicio;
     private View layoutAjustes;
@@ -42,8 +43,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         top_navigation_drawer.setAdapter(new NavigationAdapter(this));
         top_navigation_drawer.getController().peekDrawer();
         top_navigation_drawer.addOnItemSelectedListener(this);
-        // Enables Always-on
-
+        botonInicio = findViewById(R.id.imageButton);
         layoutAjustes = findViewById(R.id.layout_base_ajustes);
         layoutInicio = findViewById(R.id.layout_base_incio);
         layoutInicio.setVisibility(View.VISIBLE);
@@ -53,6 +53,15 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         getInfoContact();
 
         setAmbientEnabled();
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null && extras.getInt(ServiceFallingSensor.FUERA)==ServiceFallingSensor.ESTAS_FUERA_DE_LA_PRINCIPAL){
+            onItemSelected(0);
+            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
+            //aqui poner la caida
+
+        }
+
     }
 
     @Override
@@ -80,6 +89,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
         }
     }
+
+
 
     private  void getInfoContact(){
         SharedPreferences sharedPreferences = this.getSharedPreferences(
@@ -109,23 +120,27 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             layoutInicio.setVisibility(View.INVISIBLE);
             layoutAjustes.setVisibility(View.VISIBLE);
         }
-
     }
 
 
     public void clickButtonInicio(View view) {
+
         Log.d(TAG, "Click de inicio");
+        Intent intent;
+        intent = new Intent(this, ServiceFallingSensor.class);
+        startService(intent);
 
-        Log.d(TAG, "Empezando llamada");
-        Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:648738746"));
-        if (ContextCompat.checkSelfPermission(MainActivity.this,
-                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-            String[] permisos = {Manifest.permission.CALL_PHONE};
-            requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
+        if(caidaBool) {
+                Log.d(TAG, "Realizar llamada desde el wearable");
+                Intent callIntent = new Intent(Intent.ACTION_CALL);
+                callIntent.setData(Uri.parse("tel:648738746"));
+                if (ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    String[] permisos = {Manifest.permission.CALL_PHONE};
+                    requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
+                }
+                startActivity(callIntent);
         }
-        startActivity(callIntent);
-
     }
 
 
