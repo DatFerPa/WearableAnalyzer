@@ -8,13 +8,26 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.services.ServiceFallingSensor;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
@@ -59,9 +72,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             onItemSelected(0);
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
             //aqui poner la caida
-
         }
-
     }
 
     @Override
@@ -140,9 +151,37 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                     requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
                 }
                 startActivity(callIntent);
+        }else{
+            RequestQueue queue = Volley.newRequestQueue(this);
+            String url = "https://neuralnetworkmobile.herokuapp.com/hasfallen";
+
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            // Display the first 500 characters of the response string.
+                            Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(getApplicationContext(),error.getMessage(),Toast.LENGTH_LONG).show();
+                }
+            });
+            queue.add(stringRequest);
         }
     }
 
+    /*
+
+
+    private class HasFallen extends AsyncTask<URL,Integer,Void>{
+        @Override
+        protected Void doInBackground(URL... urls) {
+            return null;
+        }
+    }
+*/
 
     public void clickModificarContacto(View view) {
         Log.d(TAG, "Click modificar contacto");

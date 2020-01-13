@@ -35,4 +35,7 @@ dependencies {
 
     // ViewModel and LiveData
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+
+    //Volley HTTP
+    implementation 'com.android.volley:volley:1.1.1'
 }
