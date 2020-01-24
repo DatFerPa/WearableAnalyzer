@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
@@ -16,7 +15,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -24,10 +23,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.services.ServiceFallingSensor;
+import org.json.JSONArray;
+import org.json.JSONException;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
@@ -46,6 +48,9 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     private TextView telefonoTextView;
     private TextView contactoTextView;
+
+    //estoy hay que borrarlo
+    public String prueba = "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +76,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         if(extras != null && extras.getInt(ServiceFallingSensor.FUERA)==ServiceFallingSensor.ESTAS_FUERA_DE_LA_PRINCIPAL){
             onItemSelected(0);
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
-            //aqui poner la caida
+            caidaBool = true;
         }
     }
 
@@ -137,11 +142,12 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     public void clickButtonInicio(View view) {
 
         Log.d(TAG, "Click de inicio");
-        Intent intent;
-        intent = new Intent(this, ServiceFallingSensor.class);
-        startService(intent);
+        //Intent intent;
+        //intent = new Intent(this, ServiceFallingSensor.class);
+        //startService(intent);
 
         if(caidaBool) {
+                //la movida de la llamada (no esto)
                 Log.d(TAG, "Realizar llamada desde el wearable");
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
                 callIntent.setData(Uri.parse("tel:648738746"));
@@ -152,14 +158,20 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                 }
                 startActivity(callIntent);
         }else{
-            RequestQueue queue = Volley.newRequestQueue(this);
-            String url = "https://neuralnetworkmobile.herokuapp.com/hasfallen";
 
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+            //aqui no hay llamada
+            //estoy hay que borrarlo
+            RequestQueue queue = Volley.newRequestQueue(this);
+            String url = "https://neuralnetworkmobile.herokuapp.com/hasfallen/";
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            // Display the first 500 characters of the response string.
+
+                            if(response.equals("0")){
+                                Toast.makeText(getApplicationContext(),"ajajaj",Toast.LENGTH_LONG).show();
+                            }
                             Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         }
                     }, new Response.ErrorListener() {
@@ -167,7 +179,15 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                 public void onErrorResponse(VolleyError error) {
                     Toast.makeText(getApplicationContext(),error.getMessage(),Toast.LENGTH_LONG).show();
                 }
-            });
+            }){
+                @Override
+                protected Map<String, String> getParams(){
+                    Map<String, String>  params = new HashMap<String, String>();
+                    params.put("accel",prueba);
+                    return params;
+                }
+            };
+
             queue.add(stringRequest);
         }
     }

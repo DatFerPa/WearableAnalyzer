@@ -37,6 +37,8 @@ for numbers,labels in training_data:
     y.append(labels)
 x = np.array(x)
 y = np.array(y)
+print(x)
+print(y)
 import tensorflow as tf
 
 model = tf.keras.models.Sequential()
@@ -50,3 +52,4 @@ model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['
 
 model.fit(x,y,epochs=3)#le pasamos lo que queremos entrenar, recordar que epochs, son las iteraciuones a todo el modelo
 val_loss, val_acc = model.evaluate(x, y)
+model.save('modelo_caidas')

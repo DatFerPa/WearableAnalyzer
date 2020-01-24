@@ -6,7 +6,7 @@ mnist = tf.keras.datasets.mnist
 x_train = tf.keras.utils.normalize(x_train, axis= 1)
 x_test = tf.keras.utils.normalize(x_test, axis= 1)
 #print(y_train[0])
-print(x_train[0])
+print(y_train[0])
 #plt.imshow(x_train[0],cmap = plt.cm.binary)
 #plt.show()
 
@@ -35,6 +35,6 @@ new_model = tf.keras.models.load_model('primer_modelo')
 #predicciones
 predictions = new_model.predict(x_test)
 import numpy as np
-#print(np.argmax(predictions[0]))
+print(np.argmax(predictions[0]))
 plt.imshow(x_test[0])
 plt.show()
