@@ -49,9 +49,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private TextView telefonoTextView;
     private TextView contactoTextView;
 
-    //estoy hay que borrarlo
-    public String prueba = "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
 
+    private Intent intent;
+
+    //estoy hay que borrarlo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +78,9 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             onItemSelected(0);
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
             caidaBool = true;
+
+            Toast.makeText(getApplicationContext(),"epaepa",Toast.LENGTH_LONG).show();
+
         }
     }
 
@@ -141,14 +145,16 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     public void clickButtonInicio(View view) {
 
-        Log.d(TAG, "Click de inicio");
-        //Intent intent;
-        //intent = new Intent(this, ServiceFallingSensor.class);
-        //startService(intent);
+
 
         if(caidaBool) {
+            Log.d(TAG, "Finalizando intent");
+            caidaBool = false;
+            stopService(intent);
                 //la movida de la llamada (no esto)
+            /*
                 Log.d(TAG, "Realizar llamada desde el wearable");
+
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
                 callIntent.setData(Uri.parse("tel:648738746"));
                 if (ContextCompat.checkSelfPermission(MainActivity.this,
@@ -157,38 +163,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                     requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
                 }
                 startActivity(callIntent);
+                */
+
         }else{
+            caidaBool = true;
+            Log.d(TAG, "Click de inicio");
+            intent = new Intent(this, ServiceFallingSensor.class);
+            startService(intent);
 
-            //aqui no hay llamada
-            //estoy hay que borrarlo
-            RequestQueue queue = Volley.newRequestQueue(this);
-            String url = "https://neuralnetworkmobile.herokuapp.com/hasfallen/";
-
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-
-                            if(response.equals("0")){
-                                Toast.makeText(getApplicationContext(),"ajajaj",Toast.LENGTH_LONG).show();
-                            }
-                            Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(getApplicationContext(),error.getMessage(),Toast.LENGTH_LONG).show();
-                }
-            }){
-                @Override
-                protected Map<String, String> getParams(){
-                    Map<String, String>  params = new HashMap<String, String>();
-                    params.put("accel",prueba);
-                    return params;
-                }
-            };
-
-            queue.add(stringRequest);
         }
     }
 

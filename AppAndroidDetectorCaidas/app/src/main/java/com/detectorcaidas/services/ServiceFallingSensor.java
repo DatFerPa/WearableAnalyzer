@@ -56,6 +56,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         double alpha = 0.8;
 
         if(contadorActual >= 1000 ){
+            contadorActual = 0;
            // Toast.makeText(this,"en background muchachooo",Toast.LENGTH_LONG).show();
 
             /*
@@ -67,23 +68,32 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
             RequestQueue queue = Volley.newRequestQueue(this);
             String url = "https://neuralnetworkmobile.herokuapp.com/hasfallen/";
 
+
+
+
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
 
-                            Log.d(TAG,response);
-                            if(response.equals("0")){
-                                /*
-                                    hay que modificar el comportamineto de la app
-                                 */
-                                if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState()== Lifecycle.State.CREATED) {
-                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                    intent.putExtra(FUERA, ESTAS_FUERA_DE_LA_PRINCIPAL);
-                                    startActivity(intent);
-                                }
+
+
+                            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState()== Lifecycle.State.CREATED) {
+                                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                intent.putExtra(FUERA, ESTAS_FUERA_DE_LA_PRINCIPAL);
+                                Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                                startActivity(intent);
+                                Log.d(TAG, response);
+                            }else{
+                                Log.d(TAG, response);
+                                Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                             }
+
+
+
+
+
+
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -98,8 +108,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     return params;
                 }
             };
-            queue.add(stringRequest);
 
+
+            queue.add(stringRequest);
         }
 
 
