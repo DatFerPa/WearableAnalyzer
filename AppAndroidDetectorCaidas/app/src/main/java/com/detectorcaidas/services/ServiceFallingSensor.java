@@ -1,5 +1,9 @@
 package com.detectorcaidas.services;
 
+
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.KeyguardManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +14,6 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -18,16 +21,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.MainActivity;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
-
-import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class ServiceFallingSensor extends Service implements SensorEventListener {
     private String prueba = "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
@@ -41,14 +40,14 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     //control de los servicios
     int contadorActual = 0;
     public final static int ESTAS_FUERA_DE_LA_PRINCIPAL = 1;
+    public final static String SERVICIO = "servicio";
     public final static String FUERA = "fueraPrincipal";
     private String accel_para_enviar = "";
 
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return null;
     }
 
     @Override
@@ -57,7 +56,8 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
         if(contadorActual >= 1000 ){
             contadorActual = 0;
-           // Toast.makeText(this,"en background muchachooo",Toast.LENGTH_LONG).show();
+            Log.d(TAG, "preparando la llamada al servidor");
+
 
             /*
                 Aqui tiene que ir lo de la peticion al servidor
@@ -77,21 +77,26 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                         public void onResponse(String response) {
 
 
-
                             if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState()== Lifecycle.State.CREATED) {
+                                Log.d(TAG, "tamos fuera de la app");
+
+
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+
                                 intent.putExtra(FUERA, ESTAS_FUERA_DE_LA_PRINCIPAL);
-                                Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                                 startActivity(intent);
                                 Log.d(TAG, response);
                             }else{
+                                Log.d(TAG, "seguinmos dentro de la app");
                                 Log.d(TAG, response);
-                                Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+
+                                Intent intent1 = new Intent();
+                                intent1.setAction("com.detectorcaidas");
+                                intent1.putExtra("data","cosi");
+                                sendBroadcast(intent1);
+                                //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                             }
-
-
-
-
 
 
                         }
@@ -111,6 +116,18 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
 
             queue.add(stringRequest);
+
+
+
+/*
+            Intent intent1 = new Intent();
+            intent1.setAction("com.detectorcaidas");
+            intent1.putExtra("data","cosi");
+            sendBroadcast(intent1);
+*/
+            Log.d(TAG, "llamada al servidor hecha");
+
+
         }
 
 

@@ -2,12 +2,13 @@ package com.detectorcaidas;
 
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
@@ -15,21 +16,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.services.ServiceFallingSensor;
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
@@ -50,12 +37,41 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private TextView contactoTextView;
 
 
-    private Intent intent;
+    private static Intent intentService;
 
-    //estoy hay que borrarlo
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG,intent.getStringExtra("data"));
+            caidaBool = true;
+            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
+
+        }
+    };
+
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.detectorcaidas");
+        registerReceiver(broadcastReceiver,intentFilter);
+/*
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+        }
+*/
+            //getWindow().addFlags();
+            //WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                 //   WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
         setContentView(R.layout.activity_main);
         pedirPermisos();
         top_navigation_drawer = findViewById(R.id.top_navigation_drawer);
@@ -70,18 +86,23 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         telefonoTextView = findViewById(R.id.numeroTelefContacto);
         contactoTextView = findViewById(R.id.nombreContacto);
         getInfoContact();
-
         setAmbientEnabled();
+    }
 
+    @Override
+    protected void onStart() {
+
+        Log.d(TAG,"onstart");
         Bundle extras = getIntent().getExtras();
         if(extras != null && extras.getInt(ServiceFallingSensor.FUERA)==ServiceFallingSensor.ESTAS_FUERA_DE_LA_PRINCIPAL){
+
             onItemSelected(0);
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
             caidaBool = true;
-
             Toast.makeText(getApplicationContext(),"epaepa",Toast.LENGTH_LONG).show();
 
         }
+        super.onStart();
     }
 
     @Override
@@ -142,7 +163,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }
     }
 
-
     public void clickButtonInicio(View view) {
 
 
@@ -150,7 +170,11 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         if(caidaBool) {
             Log.d(TAG, "Finalizando intent");
             caidaBool = false;
-            stopService(intent);
+
+            stopService(intentService);
+            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.walkingicon,null));
+
+
                 //la movida de la llamada (no esto)
             /*
                 Log.d(TAG, "Realizar llamada desde el wearable");
@@ -168,8 +192,13 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }else{
             caidaBool = true;
             Log.d(TAG, "Click de inicio");
-            intent = new Intent(this, ServiceFallingSensor.class);
-            startService(intent);
+
+
+
+
+            intentService = new Intent(this, ServiceFallingSensor.class);
+            startService(intentService);
+
 
         }
     }
