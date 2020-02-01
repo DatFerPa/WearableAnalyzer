@@ -9,7 +9,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +37,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     private TextView telefonoTextView;
     private TextView contactoTextView;
+    private CountDownTimer tiempoHastaLlamada;
 
 
     private static Intent intentService;
@@ -43,10 +46,9 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG,intent.getStringExtra("data"));
-            caidaBool = true;
-            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
 
+            Log.d(TAG,intent.getStringExtra("data"));
+            prepareAppInFall();
         }
     };
 
@@ -63,15 +65,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.detectorcaidas");
         registerReceiver(broadcastReceiver,intentFilter);
-/*
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            setShowWhenLocked(true);
-            setTurnScreenOn(true);
-        }
-*/
-            //getWindow().addFlags();
-            //WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                 //   WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+
         setContentView(R.layout.activity_main);
         pedirPermisos();
         top_navigation_drawer = findViewById(R.id.top_navigation_drawer);
@@ -95,14 +89,35 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         Log.d(TAG,"onstart");
         Bundle extras = getIntent().getExtras();
         if(extras != null && extras.getInt(ServiceFallingSensor.FUERA)==ServiceFallingSensor.ESTAS_FUERA_DE_LA_PRINCIPAL){
-
-            onItemSelected(0);
-            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
-            caidaBool = true;
-            Toast.makeText(getApplicationContext(),"epaepa",Toast.LENGTH_LONG).show();
-
+            prepareAppInFall();
         }
         super.onStart();
+
+
+    }
+
+    private void prepareAppInFall(){
+        Log.d(TAG,"prepareAppIOnFAll");
+        stopService(intentService);
+        onItemSelected(0);
+        botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
+        caidaBool = true;
+        tiempoHastaLlamada = new CountDownTimer(10000,500) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.d(TAG,"time to finish: "+millisUntilFinished);
+            }
+
+            @Override
+            public void onFinish() {
+                Log.d(TAG,"movidas de llamadas");
+                makeCallAndSMS();
+                caidaBool = false;
+                botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.walkingicon,null));
+
+            }
+        };
+        tiempoHastaLlamada.start();
     }
 
     @Override
@@ -150,6 +165,20 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         contactoTextView.setText(sharedPreferences.getString(getString(R.string.shared_nombre_contacto),getString(R.string.telefonoDefecto)));
     }
 
+
+
+    private void makeCallAndSMS(){
+        Log.d(TAG, "Realizar llamada desde el wearable");
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel:648738746"));
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            String[] permisos = {Manifest.permission.CALL_PHONE};
+            requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
+        }
+        startActivity(callIntent);
+    }
+
     @Override
     public void onItemSelected(int pos) {
 
@@ -168,26 +197,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
 
         if(caidaBool) {
-            Log.d(TAG, "Finalizando intent");
-            caidaBool = false;
+            Log.d(TAG, "CLick en caida detectada");
 
-            stopService(intentService);
+/*
+            //stopService(intentService);
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.walkingicon,null));
 
-
-                //la movida de la llamada (no esto)
-            /*
-                Log.d(TAG, "Realizar llamada desde el wearable");
-
-                Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:648738746"));
-                if (ContextCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    String[] permisos = {Manifest.permission.CALL_PHONE};
-                    requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
-                }
-                startActivity(callIntent);
-                */
+            caidaBool = false;
+            */
 
         }else{
             caidaBool = true;

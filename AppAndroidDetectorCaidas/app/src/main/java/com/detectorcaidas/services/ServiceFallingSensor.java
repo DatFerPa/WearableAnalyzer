@@ -93,7 +93,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
                                 Intent intent1 = new Intent();
                                 intent1.setAction("com.detectorcaidas");
-                                intent1.putExtra("data","cosi");
+                                intent1.putExtra("data","tamos en la app :3");
                                 sendBroadcast(intent1);
                                 //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                             }
