@@ -1,19 +1,20 @@
 package com.detectorcaidas.services;
 
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.KeyguardManager;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -21,14 +22,22 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.MainActivity;
+import com.detectorcaidas.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
 public class ServiceFallingSensor extends Service implements SensorEventListener {
+    public static final int NOTIFICATION_ID = 101;
+
+
     private String prueba = "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
     private static final String TAG = "ServiceFallingSensor";
     //sensores
@@ -75,9 +84,36 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
+                            Log.d(TAG,"respuesta");
 
+                            int requestID = (int) System.currentTimeMillis();
+
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),requestID,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+
+                            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(),MainActivity.CANAL_NOTIFICACION_ID);
+                            notificationBuilder.setContentTitle("¿Se encuentra usted bien?");
+                            notificationBuilder.setContentText("Pulse para cancelar la llamada de emergencia");
+                            notificationBuilder.setSmallIcon(R.drawable.walkingicon);
+                            notificationBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.walkingicon));
+                            notificationBuilder.setContentIntent(pendingIntent);
+                            Notification notification = notificationBuilder.build();
+
+
+                            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+                            notificationManagerCompat.notify(NOTIFICATION_ID,notification);
+
+
+
+
+
+                            /*
 
                             if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState()== Lifecycle.State.CREATED) {
+
                                 Log.d(TAG, "tamos fuera de la app");
 
 
@@ -98,12 +134,14 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                                 //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                             }
 
-
+*/
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(getApplicationContext(),error.getMessage(),Toast.LENGTH_LONG).show();
+                    if(error!=null) {
+                        Log.d(TAG, error.getMessage());
+                    }
                 }
             }){
                 @Override
@@ -116,18 +154,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
 
             queue.add(stringRequest);
-
-
-
-/*
-            Intent intent1 = new Intent();
-            intent1.setAction("com.detectorcaidas");
-            intent1.putExtra("data","cosi");
-            sendBroadcast(intent1);
-*/
             Log.d(TAG, "llamada al servidor hecha");
-
-
         }
 
 

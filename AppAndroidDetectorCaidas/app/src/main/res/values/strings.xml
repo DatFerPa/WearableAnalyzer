@@ -20,6 +20,7 @@
     <string name="contactoDefecto">Fernando</string>
     <string name="telefonoDefecto">648738746</string>
     <string name="notsupportsms">No se ha podido enviar un sms. Reloj no soporta SMS</string>
+    <string name="title_activity_cancell_call">ActivityCancellCall</string>
 
 
 </resources>

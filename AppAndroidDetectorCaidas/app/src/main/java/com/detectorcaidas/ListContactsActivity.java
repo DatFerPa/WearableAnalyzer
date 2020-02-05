@@ -34,7 +34,6 @@ public class ListContactsActivity extends WearableActivity implements ContactoAd
         setContentView(R.layout.layout_list_contacts);
         contactos = new ArrayList<>();
         getContactList();
-
         wrView = findViewById(R.id.recycler_view_contactos);
         wrView.setHasFixedSize(true);
         wrView.setEdgeItemsCenteringEnabled(true);
@@ -43,6 +42,8 @@ public class ListContactsActivity extends WearableActivity implements ContactoAd
         // wrView.setLayoutManager(new WearableLinearLayoutManager(this));
         contactoAdapter = new ContactoAdapter(contactos, this);
         wrView.setAdapter(contactoAdapter);
+
+
     }
 
 

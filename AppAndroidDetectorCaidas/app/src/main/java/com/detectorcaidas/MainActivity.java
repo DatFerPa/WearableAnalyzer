@@ -2,16 +2,22 @@ package com.detectorcaidas;
 
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.PowerManager;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +31,11 @@ import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigati
 import androidx.wear.widget.drawer.WearableNavigationDrawerView;
 
 public class MainActivity extends WearableActivity implements WearableNavigationDrawerView.OnItemSelectedListener {
+
+    //notificaciones
+    public static final String CANAL_NOTIFICACION_ID = "canal_notificacion_id";
+    public static final String NOMBRE_CANAL_NOTIFICACION = "canal de notificaciones";
+
 
     private static final String TAG = "MainActivity";
     private boolean caidaBool = false;
@@ -41,6 +52,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
 
     private static Intent intentService;
+   // public static PowerManager powerManager;
+    public static PowerManager.WakeLock powerManagerWL;
 
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -62,17 +75,35 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         super.onCreate(savedInstanceState);
 
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel notificationChannel = new NotificationChannel(CANAL_NOTIFICACION_ID,NOMBRE_CANAL_NOTIFICACION, NotificationManager.IMPORTANCE_DEFAULT);
+
+            notificationChannel.enableLights(true);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setLightColor(Color.GREEN);
+            notificationChannel.setVibrationPattern(new long[] { 500,500,500,500,500
+            });
+            //Sets whether notifications from these Channel should be visible on Lockscreen or not
+            notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+
+
+
+        pedirPermisos();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.detectorcaidas");
         registerReceiver(broadcastReceiver,intentFilter);
-
         setContentView(R.layout.activity_main);
-        pedirPermisos();
+
         top_navigation_drawer = findViewById(R.id.top_navigation_drawer);
         top_navigation_drawer.setAdapter(new NavigationAdapter(this));
         top_navigation_drawer.getController().peekDrawer();
         top_navigation_drawer.addOnItemSelectedListener(this);
         botonInicio = findViewById(R.id.imageButton);
+        botonInicio.setColorFilter(Color.GREEN);
         layoutAjustes = findViewById(R.id.layout_base_ajustes);
         layoutInicio = findViewById(R.id.layout_base_incio);
         layoutInicio.setVisibility(View.VISIBLE);
@@ -85,11 +116,13 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     @Override
     protected void onStart() {
-
         Log.d(TAG,"onstart");
         Bundle extras = getIntent().getExtras();
         if(extras != null && extras.getInt(ServiceFallingSensor.FUERA)==ServiceFallingSensor.ESTAS_FUERA_DE_LA_PRINCIPAL){
             prepareAppInFall();
+        }
+        if(caidaBool){
+            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
         }
         super.onStart();
 
@@ -100,12 +133,11 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         Log.d(TAG,"prepareAppIOnFAll");
         stopService(intentService);
         onItemSelected(0);
-        botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
         caidaBool = true;
         tiempoHastaLlamada = new CountDownTimer(10000,500) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Log.d(TAG,"time to finish: "+millisUntilFinished);
+                //Log.d(TAG,"time to finish: "+millisUntilFinished);
             }
 
             @Override
@@ -198,38 +230,35 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         if(caidaBool) {
             Log.d(TAG, "CLick en caida detectada");
-
 /*
             //stopService(intentService);
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.walkingicon,null));
-
-            caidaBool = false;
+           caidaBool = false;
             */
-
         }else{
             caidaBool = true;
             Log.d(TAG, "Click de inicio");
 
+/*
 
+            CountDownTimer c = new CountDownTimer(30000,10000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    Log.d(TAG, String.valueOf(millisUntilFinished));
+                }
 
-
+                @Override
+                public void onFinish() {
+                    intentService = new Intent(getApplicationContext(), ServiceFallingSensor.class);
+                    startService(intentService);
+                }
+            }.start();
+*/
             intentService = new Intent(this, ServiceFallingSensor.class);
             startService(intentService);
-
-
         }
     }
 
-    /*
-
-
-    private class HasFallen extends AsyncTask<URL,Integer,Void>{
-        @Override
-        protected Void doInBackground(URL... urls) {
-            return null;
-        }
-    }
-*/
 
     public void clickModificarContacto(View view) {
         Log.d(TAG, "Click modificar contacto");
@@ -262,6 +291,23 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             return arrayViews.length;
         }
     }
+
+
+
+    @Override
+    public void onEnterAmbient(Bundle ambientDetails) {
+        super.onEnterAmbient(ambientDetails);
+        botonInicio.setColorFilter(Color.WHITE);
+    }
+
+    @Override
+    public void onExitAmbient() {
+        super.onExitAmbient();
+        botonInicio.setColorFilter(Color.GREEN);
+    }
+
+
+
 
 }
 
