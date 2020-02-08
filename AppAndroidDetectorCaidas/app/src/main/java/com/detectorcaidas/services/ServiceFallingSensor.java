@@ -85,15 +85,18 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
-                            Log.d(TAG,"respuesta");
+                            Log.d(TAG,"respuesta fuera");
 
                             //ademas de que la respuesta sea que nos hemos caido
                             if(!MainActivity.caidaBool) {
+                                Log.d(TAG,"respuesta dentro");
                                 MainActivity.caidaBool = true;
                                 int requestID = (int) System.currentTimeMillis();
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
+                                //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                intent.setAction(Intent.ACTION_MAIN);
+                                intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), requestID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.CANAL_NOTIFICACION_ID);
@@ -136,13 +139,20 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
                                     Intent intent2 = new Intent(getApplicationContext(), MainActivity.class);
                                     intent2.putExtra(FUERA, ESTAS_FUERA_DE_LA_PRINCIPAL);
-                                    intent2.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                    intent2.setAction(Intent.ACTION_MAIN);
+                                    intent2.addCategory(Intent.CATEGORY_LAUNCHER);
+                                    intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
                                     startActivity(intent2);
                                     Log.d(TAG, response);
-                                } else {
+                                } else if(MainActivity.onpause) {
+                                    Intent intent1 = new Intent();
+                                    intent1.setAction("com.detectorcaidas");
+                                    intent1.putExtra("data", "finalizar");
+                                    sendBroadcast(intent1);
+                                }else {
                                     Log.d(TAG, "seguinmos dentro de la app");
                                     Log.d(TAG, response);
-
                                     Intent intent1 = new Intent();
                                     intent1.setAction("com.detectorcaidas");
                                     intent1.putExtra("data", "caida");

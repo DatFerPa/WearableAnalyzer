@@ -28,6 +28,7 @@
             android:layout_height="50dp"
             android:layout_gravity="bottom|left"
             android:background="@null"
+            android:onClick="onClockOk"
             android:src="@drawable/ok" />
 
         <ImageButton
@@ -36,6 +37,7 @@
             android:layout_height="50dp"
             android:layout_gravity="bottom|right"
             android:background="@null"
+            android:onClick="onClickCancel"
             android:src="@drawable/cancel" />
     </FrameLayout>
 </androidx.wear.widget.BoxInsetLayout>

@@ -2,8 +2,11 @@ package com.detectorcaidas;
 
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -28,9 +31,29 @@ public class ListContactsActivity extends WearableActivity implements ContactoAd
     private ContactoAdapter contactoAdapter;
     private List<Contacto> contactos;
 
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG,intent.getStringExtra("data"));
+            if(intent.getStringExtra("data").equals("finalizar")) {
+               unregisterReceiver(this);
+                finish();
+                Intent intent1 = new Intent();
+                intent1.setAction("com.detectorcaidas");
+                intent1.putExtra("data", "caida");
+                sendBroadcast(intent1);
+            }
+        }
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.detectorcaidas");
+        registerReceiver(broadcastReceiver,intentFilter);
         setContentView(R.layout.layout_list_contacts);
         contactos = new ArrayList<>();
         getContactList();
@@ -39,12 +62,17 @@ public class ListContactsActivity extends WearableActivity implements ContactoAd
         wrView.setEdgeItemsCenteringEnabled(true);
         CustomScrollingLayoutCallback customScrollingLayoutCallback = new CustomScrollingLayoutCallback();
         wrView.setLayoutManager(new WearableLinearLayoutManager(this, customScrollingLayoutCallback));
-        // wrView.setLayoutManager(new WearableLinearLayoutManager(this));
         contactoAdapter = new ContactoAdapter(contactos, this);
         wrView.setAdapter(contactoAdapter);
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
+        finish();
+    }
 
     @Override
     public void onClickElemento(int position) {

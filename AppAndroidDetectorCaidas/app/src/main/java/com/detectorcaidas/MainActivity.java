@@ -13,17 +13,13 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.detectorcaidas.services.ServiceFallingSensor;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -38,6 +34,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     private static final String TAG = "MainActivity";
     public static boolean caidaBool;
+    public static boolean onpause;
     private WearableNavigationDrawerView top_navigation_drawer;
     private String[] arrayViews = {"Inicio", "Ajustes"};
     private ImageButton botonInicio;
@@ -86,9 +83,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }
 
         pedirPermisos();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.detectorcaidas");
-        registerReceiver(broadcastReceiver,intentFilter);
+
         setContentView(R.layout.activity_main);
 
         top_navigation_drawer = findViewById(R.id.top_navigation_drawer);
@@ -110,6 +105,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     @Override
     protected void onStart() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.detectorcaidas");
+        registerReceiver(broadcastReceiver,intentFilter);
+        onpause = false;
         Log.d(TAG,"onstart");
         Bundle extras = getIntent().getExtras();
         if(extras != null && extras.getInt(ServiceFallingSensor.FUERA)==ServiceFallingSensor.ESTAS_FUERA_DE_LA_PRINCIPAL){
@@ -194,6 +193,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.walkingicon,null));
             caidaBool = false;
+            //esto de momento
+            stopService(intentService);
         }else{
 
             Log.d(TAG, "Click de inicio");
@@ -245,6 +246,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     public void onExitAmbient() {
         super.onExitAmbient();
         botonInicio.setColorFilter(Color.GREEN);
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG,"pause");
+        onpause = true;
+        unregisterReceiver(broadcastReceiver);
+        super.onPause();
     }
 
 }
