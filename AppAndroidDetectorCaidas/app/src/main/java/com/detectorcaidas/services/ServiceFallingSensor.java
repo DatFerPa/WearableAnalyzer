@@ -2,19 +2,24 @@ package com.detectorcaidas.services;
 
 
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -23,14 +28,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.MainActivity;
 import com.detectorcaidas.R;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
@@ -52,6 +56,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     public final static String SERVICIO = "servicio";
     public final static String FUERA = "fueraPrincipal";
     private String accel_para_enviar = "";
+    private CountDownTimer tiempoHastaLlamada;
 
 
     @Override
@@ -67,7 +72,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
             contadorActual = 0;
             Log.d(TAG, "preparando la llamada al servidor");
 
-
             /*
                 Aqui tiene que ir lo de la peticion al servidor
                 COn la respuesta, tenemos que hacer lo de relanzar la app o no,
@@ -77,64 +81,77 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
             RequestQueue queue = Volley.newRequestQueue(this);
             String url = "https://neuralnetworkmobile.herokuapp.com/hasfallen/";
 
-
-
-
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             Log.d(TAG,"respuesta");
 
-                            int requestID = (int) System.currentTimeMillis();
+                            //ademas de que la respuesta sea que nos hemos caido
+                            if(!MainActivity.caidaBool) {
 
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-                            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),requestID,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-
-                            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(),MainActivity.CANAL_NOTIFICACION_ID);
-                            notificationBuilder.setContentTitle("¿Se encuentra usted bien?");
-                            notificationBuilder.setContentText("Pulse para cancelar la llamada de emergencia");
-                            notificationBuilder.setSmallIcon(R.drawable.walkingicon);
-                            notificationBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
-                            notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.walkingicon));
-                            notificationBuilder.setContentIntent(pendingIntent);
-                            Notification notification = notificationBuilder.build();
-
-
-                            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
-                            notificationManagerCompat.notify(NOTIFICATION_ID,notification);
-
-
-
-
-
-                            /*
-
-                            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState()== Lifecycle.State.CREATED) {
-
-                                Log.d(TAG, "tamos fuera de la app");
-
-
+                                int requestID = (int) System.currentTimeMillis();
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-                                intent.putExtra(FUERA, ESTAS_FUERA_DE_LA_PRINCIPAL);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                                startActivity(intent);
-                                Log.d(TAG, response);
-                            }else{
-                                Log.d(TAG, "seguinmos dentro de la app");
-                                Log.d(TAG, response);
+                                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), requestID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                                Intent intent1 = new Intent();
-                                intent1.setAction("com.detectorcaidas");
-                                intent1.putExtra("data","tamos en la app :3");
-                                sendBroadcast(intent1);
-                                //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                                NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.CANAL_NOTIFICACION_ID);
+                                notificationBuilder.setContentTitle("¿Se encuentra usted bien?");
+                                notificationBuilder.setContentText("Pulse para cancelar la llamada de emergencia");
+                                notificationBuilder.setSmallIcon(R.drawable.walkingicon);
+                                notificationBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
+                                notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.walkingicon));
+                                notificationBuilder.setContentIntent(pendingIntent);
+                                Notification notification = notificationBuilder.build();
+
+                                NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+                                notificationManagerCompat.notify(NOTIFICATION_ID, notification);
+
+                                tiempoHastaLlamada = new CountDownTimer(30000, 500) {
+                                    @Override
+                                    public void onTick(long millisUntilFinished) {
+                                        Log.d(TAG, "time to finish: " + millisUntilFinished);
+                                    }
+
+                                    @Override
+                                    public void onFinish() {
+                                        if (MainActivity.caidaBool) {
+                                            Log.d(TAG, "movidas de llamadas");
+                                            makeCallAndSMS();
+                                            Intent intent1 = new Intent();
+                                            intent1.setAction("com.detectorcaidas");
+                                            intent1.putExtra("data", "recuperar");
+                                            sendBroadcast(intent1);
+                                            //ya no nos habremos caido
+                                            MainActivity.caidaBool = false;
+                                        }
+                                    }
+                                };
+
+                                if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState() == Lifecycle.State.CREATED) {
+
+                                    Log.d(TAG, "tamos fuera de la app");
+
+                                    Intent intent2 = new Intent(getApplicationContext(), MainActivity.class);
+                                    intent2.putExtra(FUERA, ESTAS_FUERA_DE_LA_PRINCIPAL);
+                                    intent2.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                                    startActivity(intent2);
+                                    Log.d(TAG, response);
+                                } else {
+                                    Log.d(TAG, "seguinmos dentro de la app");
+                                    Log.d(TAG, response);
+
+                                    Intent intent1 = new Intent();
+                                    intent1.setAction("com.detectorcaidas");
+                                    intent1.putExtra("data", "caida");
+                                    sendBroadcast(intent1);
+                                    //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                                }
+                                //Nos acabamos de caer
+                                MainActivity.caidaBool = true;
+                                tiempoHastaLlamada.start();
                             }
-
-*/
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -200,4 +217,23 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         sensorManager.unregisterListener(this);
         super.onDestroy();
     }
+
+    private void makeCallAndSMS(){
+        Log.d(TAG, "Realizar llamada desde el wearable");
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel:648738746"));
+        if (ContextCompat.checkSelfPermission(getApplicationContext(),
+                Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            startActivity(callIntent);
+        }else{
+            Toast.makeText(getApplicationContext(),"No se ha podido realizar la llamada",Toast.LENGTH_LONG).show();
+        }
+        Intent intent1 = new Intent();
+        intent1.setAction("com.detectorcaidas");
+        intent1.putExtra("data","recuperar");
+        sendBroadcast(intent1);
+    }
+
+
+
 }
