@@ -71,14 +71,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         super.onCreate(savedInstanceState);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            Log.d(TAG,"Creando el canal de las notificaciones");
             NotificationChannel notificationChannel = new NotificationChannel(CANAL_NOTIFICACION_ID,NOMBRE_CANAL_NOTIFICACION, NotificationManager.IMPORTANCE_DEFAULT);
 
             notificationChannel.enableLights(true);
-            notificationChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
+            notificationChannel.setImportance(NotificationManager.IMPORTANCE_DEFAULT);
             notificationChannel.enableVibration(true);
             notificationChannel.setLightColor(Color.GREEN);
-            notificationChannel.setVibrationPattern(new long[] { 500,500,500,500,500
-            });
+            notificationChannel.setVibrationPattern(new long[] { 500,500,500,500,500 });
             //Sets whether notifications from these Channel should be visible on Lockscreen or not
             notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -124,10 +124,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
     private void prepareAppInFall(){
-        Log.d(TAG,"prepareAppIOnFAll");
+        Log.d(TAG,"prepareAppOnFall");
+        botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
         stopService(intentService);
         onItemSelected(0);
-        caidaBool = true;
     }
 
     @Override

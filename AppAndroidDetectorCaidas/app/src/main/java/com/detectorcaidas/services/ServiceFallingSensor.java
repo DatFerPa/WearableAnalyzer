@@ -89,7 +89,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
                             //ademas de que la respuesta sea que nos hemos caido
                             if(!MainActivity.caidaBool) {
-
+                                MainActivity.caidaBool = true;
                                 int requestID = (int) System.currentTimeMillis();
                                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -101,6 +101,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                                 notificationBuilder.setContentText("Pulse para cancelar la llamada de emergencia");
                                 notificationBuilder.setSmallIcon(R.drawable.walkingicon);
                                 notificationBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
+                                notificationBuilder.setVibrate(new long[]{500,500});
                                 notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.walkingicon));
                                 notificationBuilder.setContentIntent(pendingIntent);
                                 Notification notification = notificationBuilder.build();
@@ -146,10 +147,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                                     intent1.setAction("com.detectorcaidas");
                                     intent1.putExtra("data", "caida");
                                     sendBroadcast(intent1);
-                                    //Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                                 }
                                 //Nos acabamos de caer
-                                MainActivity.caidaBool = true;
+
                                 tiempoHastaLlamada.start();
                             }
                         }

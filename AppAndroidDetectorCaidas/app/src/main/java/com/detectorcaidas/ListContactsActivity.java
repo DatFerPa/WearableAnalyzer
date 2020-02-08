@@ -43,7 +43,6 @@ public class ListContactsActivity extends WearableActivity implements ContactoAd
         contactoAdapter = new ContactoAdapter(contactos, this);
         wrView.setAdapter(contactoAdapter);
 
-
     }
 
 
@@ -97,5 +96,12 @@ public class ListContactsActivity extends WearableActivity implements ContactoAd
             child.setScaleX(1 - progressToCenter);
             child.setScaleY(1 - progressToCenter);
         }
+    }
+
+
+    @Override
+    public void onEnterAmbient(Bundle ambientDetails) {
+        super.onEnterAmbient(ambientDetails);
+        finish();
     }
 }

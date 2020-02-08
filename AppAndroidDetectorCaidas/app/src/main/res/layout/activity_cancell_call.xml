@@ -12,20 +12,30 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/inner_frame_layout_padding"
+        android:padding="5dp"
         app:boxedEdges="all">
 
         <TextView
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hello_world" />
+            android:gravity="center"
+            android:text="@string/pregunta_llamar_igualmente"
+            android:textColor="@color/white" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button" />
+        <ImageButton
+            android:id="@+id/botonOk"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|left"
+            android:background="@null"
+            android:src="@drawable/ok" />
 
+        <ImageButton
+            android:id="@+id/botonCancel"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|right"
+            android:background="@null"
+            android:src="@drawable/cancel" />
     </FrameLayout>
 </androidx.wear.widget.BoxInsetLayout>
