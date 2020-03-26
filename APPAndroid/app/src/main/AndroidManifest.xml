@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-feature android:name="android.hardware.type.watch" />
 
     <application
@@ -14,14 +14,17 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
         <service
-            android:name=".service.ServiceSensorCaidaSi"
+            android:name=".service.ServiceSensorSiMovimiento"
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".service.ServiceSensorCaidaNo"
+            android:name=".service.ServiceSensorNoMovimiento"
             android:enabled="true"
             android:exported="true" />
-
+        <service
+            android:name=".service.ServiceSensorHeart"
+            android:enabled="true"
+            android:exported="true" />
         <uses-library
             android:name="com.google.android.wearable"
             android:required="true" />

@@ -17,10 +17,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServiceSensorCaidaNo extends Service implements SensorEventListener {
+public class ServiceSensorSiMovimiento extends Service implements SensorEventListener {
+    private static final String TAG = "ServiceSensorSiMovimiento";
 
-    private static final String TAG = "ServiceSensorCaidaNo";
-    private int contador;
     private double[] gravity = new double[3];
     private float[] linear_acceleration = new float[3];
 
@@ -30,29 +29,13 @@ public class ServiceSensorCaidaNo extends Service implements SensorEventListener
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
-
-    public ServiceSensorCaidaNo() {
+    public ServiceSensorSiMovimiento() {
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        /*
-            Aqui vamos a hacer lo de crear el SensorManager
-         */
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        contador = 1;
-
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-
-        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -70,14 +53,6 @@ public class ServiceSensorCaidaNo extends Service implements SensorEventListener
 
         //aqui vamos a añadir un linear acceleration a la lista
         lst_linear_acc.add(linear_acceleration.clone());
-
-        if (contador >= 1000) {
-            crearFicheroCaidaNo();
-            lst_linear_acc = new ArrayList<>();
-            contador = 1;
-        } else {
-            contador++;
-        }
     }
 
     @Override
@@ -86,32 +61,49 @@ public class ServiceSensorCaidaNo extends Service implements SensorEventListener
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
     public void onDestroy() {
-        Log.d(TAG,"Finalizando servicio caida no");
+        Log.d(TAG,"Finalizando servicio caida si");
         sensorManager.unregisterListener(this);
         super.onDestroy();
     }
 
-    private void crearFicheroCaidaNo() {
+    private void crearFicheroCaidaSi() {
 
-        Log.d(TAG, String.valueOf(lst_linear_acc.size()));
 
-        Log.d(TAG, getApplicationContext().getFilesDir().getPath());
+        Log.d(TAG,String.valueOf(lst_linear_acc.size()));
 
-        File fichero = new File(getApplicationContext().getFilesDir(), "caidano" + System.currentTimeMillis() + ".txt");
-        Log.d(TAG, "Guardando fichero de No caida");
-        try {
+        Log.d(TAG,getApplicationContext().getFilesDir().getPath());
+
+        File fichero = new File(getApplicationContext().getFilesDir(),"caidasi"+System.currentTimeMillis()+".txt");
+        Log.d(TAG,"Guardando fichero de Si caida");
+        try{
             BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-            for (float[] a : lst_linear_acc) {
+            //al reves
+            //int i = lst_linear_acc.size()-1;i>=lst_linear_acc.size()-iteracionesParaFichero;i--
+            for(int i = lst_linear_acc.size()-1000;i<=lst_linear_acc.size()-1;i++){
 
-                //Log.d(TAG,"Datos del accelerometro para fichero de no caida: X: "+a[0]+" - Y: "+a[1]+" - Z: "+a[2]);
-                writer.write(a[0] + ";" + a[1] + ";" + a[2] + "\n");
+                float[] datoConcreto = lst_linear_acc.get(i);
+                //Log.d(TAG,"Datos del accelerometro: X: "+datoConcreto[0]+" - Y: "+datoConcreto[1]+" - Z: "+datoConcreto[2]);
+                writer.write(datoConcreto[0]+";"+datoConcreto[1]+";"+datoConcreto[2]+"\n");
 
             }
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
+
+
+
 
 }
