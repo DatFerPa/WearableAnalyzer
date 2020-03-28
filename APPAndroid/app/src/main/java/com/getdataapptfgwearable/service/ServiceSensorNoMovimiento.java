@@ -3,6 +3,8 @@ package com.getdataapptfgwearable.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -10,10 +12,16 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.tensorflow.lite.Interpreter;
+
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +33,15 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
     private float[] linear_acceleration = new float[3];
 
     List<float[]> lst_linear_acc = new ArrayList<>();
-
+    Interpreter interpreter;
     //Sensores
     private SensorManager sensorManager;
     private Sensor accelerometer;
+
+    private String stringprueba1 =  "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
+    private float[][] floatprueba ={{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f}};
+
+
 
 
     public ServiceSensorNoMovimiento() {
@@ -53,6 +66,24 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
         contador = 1;
 
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+/*
+        File file = new File("converted_model.tflite");
+        interpreter = new Interpreter(file);
+ */
+
+        AssetFileDescriptor FileDescriptor = null;
+        try {
+            FileDescriptor = getApplication().getAssets().openFd("converted_model.tflite");
+
+        FileInputStream inputStream = new FileInputStream(FileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY,FileDescriptor.getStartOffset(),FileDescriptor.getDeclaredLength());
+        interpreter = new Interpreter(mappedByteBuffer);
+
+        } catch (IOException e) {
+            Log.d(TAG,e.getMessage());
+        }
+
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -73,10 +104,20 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
         //aqui vamos a añadir un linear acceleration a la lista
         lst_linear_acc.add(linear_acceleration.clone());
 
-        if (contador >= 1000) {
+        if (contador >= 1) {
+
+            float[][] salida = new float[1][2];
+            interpreter.run(floatprueba,salida);
+
+
+            Log.d(TAG,salida.toString());
+            /*
             crearFicheroCaidaNo();
             lst_linear_acc = new ArrayList<>();
             contador = 1;
+
+             */
+
         } else {
             contador++;
         }

@@ -9,6 +9,12 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    aaptOptions {
+        noCompress "tflite"
+        noCompress "lite"
+    }
+
     buildTypes {
         release {
             minifyEnabled false

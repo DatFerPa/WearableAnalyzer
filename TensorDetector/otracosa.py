@@ -23,7 +23,7 @@ for category in CATEGORIES:
             array_caidas = []
             for x in f1:
                 lista = list(map(float,x.split(";")))
-                print(lista)
+
                 array_caidas.append(lista)
             #print(array_caidas)
             training_data.append([array_caidas,caida_tipo])
@@ -38,8 +38,7 @@ for numbers,labels in training_data:
     y.append(labels)
 x = np.array(x)
 y = np.array(y)
-print(x)
-print(y)
+
 
 
 model = tf.keras.models.Sequential()
@@ -53,18 +52,18 @@ model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['
 
 model.fit(x,y,epochs=3)#le pasamos lo que queremos entrenar, recordar que epochs, son las iteraciuones a todo el modelo
 val_loss, val_acc = model.evaluate(x, y)
-model.save('modelo_caidas')
 
+lista_accel = []
+lista_accel.append(x[0])
+lista_otra = np.array(lista_accel)
 
+print(lista_otra)
 
+print("-----------------------------------------")
 
-# Save tf.keras model in HDF5 format.
-keras_file_caidas = "keras_model_modelo_caidas.h5"
-tf.keras.models.save_model(model, keras_file_caidas)
-
-
-# Transformar modelo para android
-converter = tf.lite.TFLiteConverter.from_keras_model_file(keras_file_caidas)
-print("fin")
-tflite_model = converter.convert()
-open("converted_model.tflite", "wb").write(tflite_model)
+prediccion = model.predict(lista_otra)
+print (prediccion)
+print("-----------------------------------------")
+print(prediccion[0])
+print("-----------------------------------------")
+print(np.argmax(prediccion[0]))

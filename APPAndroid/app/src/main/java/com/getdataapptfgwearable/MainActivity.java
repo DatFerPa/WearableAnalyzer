@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.getdataapptfgwearable.service.ServiceSensorNoMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorSiMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorHeart;
 
@@ -106,7 +107,7 @@ public class MainActivity extends WearableActivity  {
             Log.d(TAG,"Empezando la lectura de datos si caida");
             activo = true;
             botonNo.setVisibility(View.INVISIBLE);
-            intent = new Intent(this, ServiceSensorSiMovimiento.class);
+            intent = new Intent(this, ServiceSensorNoMovimiento.class);
             startService(intent);
         }
     }
