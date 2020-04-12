@@ -1,10 +1,8 @@
 package com.detectorcaidas.services;
 
 
-
 import android.Manifest;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -20,6 +18,7 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -28,10 +27,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.MainActivity;
 import com.detectorcaidas.R;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;

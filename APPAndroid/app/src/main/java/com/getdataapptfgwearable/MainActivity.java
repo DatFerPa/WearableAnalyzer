@@ -14,9 +14,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.getdataapptfgwearable.service.ServiceSensorNoMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorSiMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorHeart;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends WearableActivity  {
@@ -83,6 +92,34 @@ public class MainActivity extends WearableActivity  {
     }
 
     public void onClickCaidaNo(View view) {
+        //probando el sacar los datos
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "https://servidorhombremuerto.herokuapp.com/turnos/";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG,response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error!=null) {
+                    Log.d(TAG, error.getMessage());
+                }
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("nombre","Fer");
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
+
+        /*
       if(activo){
           Log.d(TAG,"Finalizando la lectura de datos no caida");
           activo = false;
@@ -95,9 +132,41 @@ public class MainActivity extends WearableActivity  {
           intent = new Intent(this, ServiceSensorHeart.class);
           startService(intent);
       }
+         */
+
     }
 
     public void onCLickCaidaSi(View view){
+        //probando el login
+        String url = "https://servidorhombremuerto.herokuapp.com/login/";
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG,response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(error!=null) {
+                    Log.d(TAG, error.getMessage());
+                }
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("nombre","Fer");
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
+
+
+        /*
         if(activo){
             activo = false;
             Log.d(TAG,"Finalizando la lectura de datos si caida");
@@ -110,6 +179,7 @@ public class MainActivity extends WearableActivity  {
             intent = new Intent(this, ServiceSensorNoMovimiento.class);
             startService(intent);
         }
+         */
     }
 
 }
