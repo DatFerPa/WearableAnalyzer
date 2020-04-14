@@ -16,14 +16,22 @@
         android:layout_height="match_parent">
 
         <include
+            android:id="@+id/include_layout_inicio"
             layout="@layout/layout_inicio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
         <include
-            layout="@layout/layout_ajustes"
+            android:id="@+id/include_layout_turno"
+            layout="@layout/layout_turno"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/include_layout_turno"
+            layout="@layout/layout_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <androidx.wear.widget.drawer.WearableNavigationDrawerView
             android:id="@+id/top_navigation_drawer"

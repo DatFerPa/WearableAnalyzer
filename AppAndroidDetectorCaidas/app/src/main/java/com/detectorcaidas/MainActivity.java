@@ -36,10 +36,11 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     public static boolean caidaBool;
     public static boolean onpause;
     private WearableNavigationDrawerView top_navigation_drawer;
-    private String[] arrayViews = {"Inicio", "Ajustes"};
+    private String[] arrayViews = {"Inicio", "Turno","Cerrar sesión"};
     private ImageButton botonInicio;
     private View layoutInicio;
-    private View layoutAjustes;
+    private View layoutTurno;
+    private View layoutLogout;
     private TextView telefonoTextView;
     private TextView contactoTextView;
 
@@ -92,10 +93,11 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         top_navigation_drawer.addOnItemSelectedListener(this);
         botonInicio = findViewById(R.id.imageButton);
         botonInicio.setColorFilter(Color.GREEN);
-        layoutAjustes = findViewById(R.id.layout_base_ajustes);
-        layoutInicio = findViewById(R.id.layout_base_incio);
+        layoutTurno = findViewById(R.id.include_layout_turno);
+        layoutInicio = findViewById(R.id.include_layout_inicio);
+        layoutLogout = findViewById(R.id.include_layout_logout);
         layoutInicio.setVisibility(View.VISIBLE);
-        layoutAjustes.setVisibility(View.INVISIBLE);
+        layoutTurno.setVisibility(View.INVISIBLE);
         telefonoTextView = findViewById(R.id.numeroTelefContacto);
         contactoTextView = findViewById(R.id.nombreContacto);
         getInfoContact();
@@ -117,7 +119,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         if(caidaBool){
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
         }else{
-            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.walkingicon,null));
+            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
         }
         super.onStart();
     }
@@ -179,10 +181,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         Log.d(TAG, "Cambio de pestaña de navigation drawer");
         if (pos == 0) {
             layoutInicio.setVisibility(View.VISIBLE);
-            layoutAjustes.setVisibility(View.INVISIBLE);
+            layoutTurno.setVisibility(View.INVISIBLE);
         } else {
             layoutInicio.setVisibility(View.INVISIBLE);
-            layoutAjustes.setVisibility(View.VISIBLE);
+            layoutTurno.setVisibility(View.VISIBLE);
         }
     }
 
@@ -191,7 +193,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         if(caidaBool) {
             Log.d(TAG, "CLick en caida detectada");
 
-            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.walkingicon,null));
+            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
             caidaBool = false;
             //esto de momento
             stopService(intentService);
@@ -227,7 +229,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         @Override
         public Drawable getItemDrawable(int pos) {
-            return (pos == 0) ? context.getDrawable(getResources().getIdentifier("walkingicon", "drawable", getPackageName())) : context.getDrawable(getResources().getIdentifier("settings", "drawable", getPackageName()));
+            //return (pos == 0) ? context.getDrawable(getResources().getIdentifier("walkingicon", "drawable", getPackageName())) : context.getDrawable(getResources().getIdentifier("settings", "drawable", getPackageName()));
+            if(pos == 0){
+                return context.getDrawable(getResources().getIdentifier("seat_icon", "drawable", getPackageName()));
+            }else if(pos == 1){
+                return context.getDrawable(getResources().getIdentifier("cartera", "drawable", getPackageName()));
+            }else{
+                return context.getDrawable(getResources().getIdentifier("exit", "drawable", getPackageName()));
+            }
         }
 
         @Override

@@ -48,49 +48,52 @@ public class LoginActivity extends WearableActivity {
     }
 
     public void onClickLogin(View view) {
+        //borrar esto luego
+        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+        startActivity(intent);
+
+        /*
         botonLogin.setClickable(false);
         textoMaquinista.setClickable(false);
 
-
-
-            String url = "https://servidorhombremuerto.herokuapp.com/login/";
-            RequestQueue queue = Volley.newRequestQueue(this);
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.d(TAG,response);
-                            botonLogin.setClickable(true);
-                            textoMaquinista.setClickable(true);
-                            if(response.equals("si")){
-                                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES), Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(getString(R.string.shared_nombre_maquinista),textoMaquinista.getText().toString());
-                                editor.commit();
-                                Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-                                startActivity(intent);
-                            }else{
-                                Toast.makeText(getApplicationContext(),"El maquinista no se encunetra en el sistema",Toast.LENGTH_LONG).show();
-                            }
+        String url = "https://servidorhombremuerto.herokuapp.com/login/";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG,response);
+                        botonLogin.setClickable(true);
+                        textoMaquinista.setClickable(true);
+                        if(response.equals("si")){
+                            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES), Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(getString(R.string.shared_nombre_maquinista),textoMaquinista.getText().toString());
+                            editor.commit();
+                            Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(getApplicationContext(),"El maquinista no se encunetra en el sistema",Toast.LENGTH_LONG).show();
                         }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(getApplicationContext(),"Fallo en el servidor. Intentelo más tarde",Toast.LENGTH_LONG).show();
-                }
-            }){
-                @Override
-                protected Map<String, String> getParams(){
-                    Map<String, String>  params = new HashMap<String, String>();
-                    String nombre = textoMaquinista.getText().toString();
-                    params.put("nombre",nombre);
-                    return params;
-                }
-            };
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"Fallo en el servidor. Intentelo más tarde",Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String>  params = new HashMap<String, String>();
+                String nombre = textoMaquinista.getText().toString();
+                params.put("nombre",nombre);
+                return params;
+            }
+        };
 
-            queue.add(stringRequest);
+        queue.add(stringRequest);
 
-
+*/
 
 
     }
