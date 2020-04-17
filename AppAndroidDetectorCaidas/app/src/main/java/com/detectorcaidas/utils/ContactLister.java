@@ -4,7 +4,7 @@ package com.detectorcaidas.utils;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import com.detectorcaidas.recycle.Contacto;
+
 import java.util.ArrayList;
 import java.util.List;
 

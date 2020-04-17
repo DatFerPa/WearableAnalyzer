@@ -34,6 +34,7 @@ public class LoginActivity extends WearableActivity {
         SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
         if(sharedPreferences.contains(getString(R.string.shared_nombre_maquinista))){
             Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }else {
 
@@ -71,6 +72,7 @@ public class LoginActivity extends WearableActivity {
                             editor.putString(getString(R.string.shared_nombre_maquinista),textoMaquinista.getText().toString());
                             editor.commit();
                             Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         }else{
                             Toast.makeText(getApplicationContext(),"El maquinista no se encunetra en el sistema",Toast.LENGTH_LONG).show();

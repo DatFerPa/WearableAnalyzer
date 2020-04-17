@@ -41,8 +41,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private View layoutInicio;
     private View layoutTurno;
     private View layoutLogout;
-    private TextView telefonoTextView;
-    private TextView contactoTextView;
 
 
     private static Intent intentService;
@@ -98,9 +96,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         layoutLogout = findViewById(R.id.include_layout_logout);
         layoutInicio.setVisibility(View.VISIBLE);
         layoutTurno.setVisibility(View.INVISIBLE);
-        telefonoTextView = findViewById(R.id.numeroTelefContacto);
-        contactoTextView = findViewById(R.id.nombreContacto);
-        getInfoContact();
+        layoutLogout.setVisibility(View.INVISIBLE);
         setAmbientEnabled();
 
     }
@@ -136,8 +132,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         super.onResume();
         SharedPreferences sharedPreferences = this.getSharedPreferences(
                 getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
-        telefonoTextView.setText(sharedPreferences.getString(getString(R.string.shared_telefono_contacto),getString(R.string.contactoDefecto)));
-        contactoTextView.setText(sharedPreferences.getString(getString(R.string.shared_nombre_contacto),getString(R.string.telefonoDefecto)));
     }
 
     private void pedirPermisos(){
@@ -156,22 +150,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }
     }
 
-    private  void getInfoContact(){
-        SharedPreferences sharedPreferences = this.getSharedPreferences(
-                getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
 
-        if(sharedPreferences.contains(getString(R.string.shared_nombre_contacto))
-            && sharedPreferences.contains(getString(R.string.shared_telefono_contacto))){
-
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(getString(R.string.shared_nombre_contacto),getString(R.string.contactoDefecto));
-            editor.putString(getString(R.string.shared_telefono_contacto),getString(R.string.telefonoDefecto));
-            editor.commit();
-        }
-
-        telefonoTextView.setText(sharedPreferences.getString(getString(R.string.shared_telefono_contacto),getString(R.string.contactoDefecto)));
-        contactoTextView.setText(sharedPreferences.getString(getString(R.string.shared_nombre_contacto),getString(R.string.telefonoDefecto)));
-    }
 
 
 
@@ -182,9 +161,15 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         if (pos == 0) {
             layoutInicio.setVisibility(View.VISIBLE);
             layoutTurno.setVisibility(View.INVISIBLE);
-        } else {
+            layoutLogout.setVisibility(View.INVISIBLE);
+        } else if(pos == 1) {
             layoutInicio.setVisibility(View.INVISIBLE);
             layoutTurno.setVisibility(View.VISIBLE);
+            layoutLogout.setVisibility(View.INVISIBLE);
+        }else{
+            layoutInicio.setVisibility(View.INVISIBLE);
+            layoutTurno.setVisibility(View.INVISIBLE);
+            layoutLogout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -207,11 +192,30 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
 
-    public void clickModificarContacto(View view) {
-        Log.d(TAG, "Click modificar contacto");
-        Intent intent = new Intent(this, ListContactsActivity.class);
+
+    public void clickButtonTurno(View view){
+        //movidas para empezar y fnalizar el turno
+        Intent intent = new Intent(this,ListTurnoActivity.class);
+        startActivity(intent);
+
+
+
+    }
+
+
+    public void clickButtonLogout(View view){
+        //borrar shared preferences y devolver a la activity de login
+        SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(getString(R.string.shared_nombre_maquinista));
+        editor.remove(getString(R.string.shared_nombre_tren));
+        editor.remove(getString(R.string.shared_nombre_turno));
+        editor.commit();
+        Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
         startActivity(intent);
     }
+
+
 
 
     private final class NavigationAdapter extends WearableNavigationDrawerAdapter {

@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <androidx.wear.widget.WearableRecyclerView
-        android:id="@+id/recycler_view_contactos"
+        android:id="@+id/recycler_view_turnos"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"

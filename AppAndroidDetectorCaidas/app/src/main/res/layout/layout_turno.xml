@@ -15,30 +15,11 @@
         app:boxedEdges="top"
         tools:ignore="MissingPrefix">
 
-        <TextView
-            android:id="@+id/textViewTextoAjustes"
+        <Button
+            android:id="@+id/buttonTurno"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="top|center"
-            android:text="@string/ajustes_info"
-            tools:text="@string/ajustes_info" />
-
-        <TextView
-            android:id="@+id/numeroTelefContacto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:onClick="clickModificarContacto"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/nombreContacto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
-            android:onClick="clickModificarContacto"
-            android:paddingBottom="40dp"
-            android:textStyle="bold" />
-
+            android:onClick="clickButtonTurno"
+            android:text="@string/empezar_turno" />
     </FrameLayout>
 </androidx.wear.widget.BoxInsetLayout>
