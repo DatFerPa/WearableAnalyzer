@@ -20,8 +20,9 @@
             android:id="@+id/textLogout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|center"
+            android:layout_gravity="center|top"
             android:text="@string/text_logout"
+            android:textAlignment="center"
             android:textSize="24sp" />
 
         <ImageButton
@@ -29,8 +30,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|center"
-            android:background="@drawable/action_item_background"
+            android:background="@android:color/transparent"
             android:onClick="clickButtonLogout"
-            app:srcCompat="@drawable/exit" />
+            android:src="@drawable/exit" />
     </FrameLayout>
 </androidx.wear.widget.BoxInsetLayout>

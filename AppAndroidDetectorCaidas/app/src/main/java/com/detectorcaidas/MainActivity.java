@@ -201,13 +201,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     public void clickButtonLogout(View view){
         //borrar shared preferences y devolver a la activity de login
+        Log.d(TAG,"Logout antes de borrar las shared preferences");
         SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove(getString(R.string.shared_nombre_maquinista));
-        editor.remove(getString(R.string.shared_nombre_tren));
-        editor.remove(getString(R.string.shared_nombre_turno));
+        editor.clear();
         editor.commit();
+        Log.d(TAG,"Logout despues de borrar las shared preferences");
         Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 

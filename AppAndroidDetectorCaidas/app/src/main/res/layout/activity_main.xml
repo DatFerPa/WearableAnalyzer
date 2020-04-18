@@ -19,19 +19,22 @@
             android:id="@+id/include_layout_inicio"
             layout="@layout/layout_inicio"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="visible" />
 
         <include
             android:id="@+id/include_layout_turno"
             layout="@layout/layout_turno"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="visible" />
 
         <include
             android:id="@+id/include_layout_logout"
             layout="@layout/layout_logout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
 
         <androidx.wear.widget.drawer.WearableNavigationDrawerView
             android:id="@+id/top_navigation_drawer"

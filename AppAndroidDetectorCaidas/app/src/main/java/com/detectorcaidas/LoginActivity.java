@@ -34,11 +34,12 @@ public class LoginActivity extends WearableActivity {
         setContentView(R.layout.activity_login);
         SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
         if(sharedPreferences.contains(getString(R.string.shared_nombre_maquinista))){
+            Log.d(TAG,"Login con shared preferences");
             Intent intent = new Intent(getApplicationContext(),MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }else {
-
+            Log.d(TAG,"Login sin shared preferences");
             setContentView(R.layout.activity_login);
             textoMaquinista = findViewById(R.id.textMaquinista);
             botonLogin = findViewById(R.id.buttonLogin);
