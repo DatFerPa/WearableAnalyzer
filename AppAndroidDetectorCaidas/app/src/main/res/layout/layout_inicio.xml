@@ -8,7 +8,7 @@
     android:orientation="horizontal">
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/botonInicial"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/action_button_background"

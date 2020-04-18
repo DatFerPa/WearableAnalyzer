@@ -31,6 +31,7 @@ public class LoginActivity extends WearableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
         SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
         if(sharedPreferences.contains(getString(R.string.shared_nombre_maquinista))){
             Intent intent = new Intent(getApplicationContext(),MainActivity.class);
@@ -53,7 +54,7 @@ public class LoginActivity extends WearableActivity {
         Intent intent = new Intent(getApplicationContext(),MainActivity.class);
         startActivity(intent);
 
-        /*
+
         botonLogin.setClickable(false);
         textoMaquinista.setClickable(false);
 
@@ -95,7 +96,7 @@ public class LoginActivity extends WearableActivity {
 
         queue.add(stringRequest);
 
-*/
+
 
 
     }

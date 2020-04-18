@@ -18,6 +18,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.recycle.Turno;
 import com.detectorcaidas.recycle.TurnoAdapter;
+import com.detectorcaidas.services.ServiceFallingSensor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +57,7 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_list_turnos);
         turnos = getTurnos();
+        Log.d(TAG,turnos.toString());
         wrView = findViewById(R.id.recycler_view_turnos);
         wrView.setHasFixedSize(true);
         wrView.setEdgeItemsCenteringEnabled(true);
@@ -63,6 +65,10 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
         wrView.setLayoutManager(new WearableLinearLayoutManager(this,customScrollingLayoutCallbacks));
         turnoAdapter = new TurnoAdapter(turnos,this);
         wrView.setAdapter(turnoAdapter);
+
+
+
+
         // Enables Always-on
         setAmbientEnabled();
     }
@@ -72,7 +78,7 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
     @Override
     protected void onPause() {
         super.onPause();
-        unregisterReceiver(broadcastReceiver);
+        //unregisterReceiver(broadcastReceiver);
         finish();
     }
 
@@ -87,6 +93,15 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
         editor.putString(getString(R.string.shared_nombre_turno),turnos.get(position).getNombre());
         editor.putString(getString(R.string.shared_nombre_tren),turnos.get(position).getTren());
         editor.commit();
+        MainActivity.isTurnoEmpezado = true;
+        /*
+            Creamos el service para la mainactivity
+         */
+        MainActivity.intentService = new Intent(this, ServiceFallingSensor.class);
+        startService(MainActivity.intentService);
+
+
+
         finish();
     }
 
@@ -99,13 +114,15 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Log.d(TAG,response);
                         String[] turnosString = response.split(":");
                         for(String turnoString : turnosString){
                             String[] turnoStringCorte = turnoString.split(";");
                             Turno turn = new Turno(turnoStringCorte[0],turnoStringCorte[1]);
                             turnos.add(turn);
                         }
-
+                        Log.d(TAG,turnos.toString());
+                        turnoAdapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
             @Override

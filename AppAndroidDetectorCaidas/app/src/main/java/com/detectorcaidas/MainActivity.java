@@ -19,7 +19,7 @@ import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.TextView;
+
 import com.detectorcaidas.services.ServiceFallingSensor;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -43,7 +43,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private View layoutLogout;
 
 
-    private static Intent intentService;
+    public static Intent intentService;
+
+
+    public static boolean isTurnoEmpezado;
 
 
 
@@ -89,7 +92,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         top_navigation_drawer.setAdapter(new NavigationAdapter(this));
         top_navigation_drawer.getController().peekDrawer();
         top_navigation_drawer.addOnItemSelectedListener(this);
-        botonInicio = findViewById(R.id.imageButton);
+        botonInicio = findViewById(R.id.botonInicial);
         botonInicio.setColorFilter(Color.GREEN);
         layoutTurno = findViewById(R.id.include_layout_turno);
         layoutInicio = findViewById(R.id.include_layout_inicio);
@@ -175,19 +178,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     public void clickButtonInicio(View view) {
 
-        if(caidaBool) {
-            Log.d(TAG, "CLick en caida detectada");
+        if(isTurnoEmpezado && caidaBool){
 
-            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
-            caidaBool = false;
-            //esto de momento
-            stopService(intentService);
-        }else{
-
-            Log.d(TAG, "Click de inicio");
-
-            intentService = new Intent(this, ServiceFallingSensor.class);
-            startService(intentService);
         }
     }
 
@@ -195,10 +187,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     public void clickButtonTurno(View view){
         //movidas para empezar y fnalizar el turno
-        Intent intent = new Intent(this,ListTurnoActivity.class);
-        startActivity(intent);
+        if(!isTurnoEmpezado) {
+            Intent intent = new Intent(this, ListTurnoActivity.class);
+            startActivity(intent);
+        }else{
+            //quitar el service
+            stopService(intentService);
 
-
+        }
 
     }
 

@@ -1,5 +1,7 @@
 package com.detectorcaidas.recycle;
 
+import androidx.annotation.NonNull;
+
 public class Turno {
     private String nombre;
     private String tren;
@@ -15,5 +17,10 @@ public class Turno {
 
     public String getTren() {
         return tren;
+    }
+
+    @Override
+    public String toString() {
+        return "Nombre turnos: "+this.nombre+" -- Tren del turno: "+this.tren;
     }
 }
