@@ -36,7 +36,7 @@ new_model = tf.keras.models.load_model('primer_modelo')
 predictions = new_model.predict(x_test)
 import numpy as np
 
-print(predictions)
+print(len(predictions[0]))
 print("-----------------------------------------")
 print(np.argmax(predictions[0]))
 plt.imshow(x_test[0])

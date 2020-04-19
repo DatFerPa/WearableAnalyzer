@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -18,6 +19,12 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import androidx.core.app.NotificationCompat;
@@ -44,8 +51,8 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     private Sensor sensorHeart;
     private int[] grupoHeartRate;
     //control de los servicios
-    int contadorActualAccel = 0;
-    int contadorActualHeart=0;
+    int contadorActualAccel;
+    int contadorActualHeart;
     public final static int ESTAS_FUERA_DE_LA_PRINCIPAL = 1;
     public final static String SERVICIO = "servicio";
     public final static String FUERA = "fueraPrincipal";
@@ -62,6 +69,11 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        //Crear el interpreter
+        inicializarInterpreter();
+        contadorActualAccel =1;
+        contadorActualHeart = 0;
+        //Creacion de cosas relacionadas con los sensores
         grupoHeartRate = new int[5];
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -76,20 +88,23 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         return super.onStartCommand(intent, flags, startId);
     }
 
+
+    private void inicializarInterpreter(){
+        AssetFileDescriptor fileDescriptor = null;
+        try{
+            fileDescriptor = getApplication().getAssets().openFd("converted_model.tflite");
+            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+            FileChannel fileChannel = inputStream.getChannel();
+            MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY,fileDescriptor.getStartOffset(),fileDescriptor.getDeclaredLength());
+            interpreter = new Interpreter(mappedByteBuffer);
+        }catch(IOException e){
+            Log.e(TAG,e.getMessage());
+        }
+    }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         double alpha = 0.8;
-
-        if(contadorActualAccel >= 1000 ){
-            contadorActualAccel = 0;
-            Log.d(TAG, "Empezando uso de red neuronal en android");
-
-
-
-
-            Log.d(TAG, "Finalizando uso de red neuronal en android");
-        }
-
 
         /*
             Hay que poner un diferenciador entre el sensor del acelerometro y el del pulso
@@ -113,8 +128,35 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
             //aqui vamos a añadir un linear acceleration a la lista
             lst_linear_acc.add(linear_acceleration.clone());
+            if(contadorActualAccel >= 100){
+                float[][] salida = new float[1][2];
+                float[][] entrada = new float[100][];
+                int cont = 0;
+                for(float[] bloque:lst_linear_acc){
+                    entrada[cont]=bloque;
+                    cont++;
+                }
+                interpreter.run(entrada,salida);
+                Log.d(TAG,"Salida:  CaidaSi: "+salida[0][0]+" --  CaidaNo: "+salida[0][1]);
+                lst_linear_acc = new ArrayList<>();
+                contadorActualAccel = 1;
+                boolean esCaida = salida[0][0] >= salida[0][1]?true:false;
 
-            contadorActualAccel++;
+                if(esCaida){
+                    Log.d(TAG,"Si me he caido");
+                    /*
+                        Hay que mirar las pulsaciones que tenemos guardadas
+                     */
+
+                }else{
+                    Log.d(TAG,"No me he caido");
+
+
+                }
+
+            }else {
+                contadorActualAccel++;
+            }
 
         }else{
             if(contadorActualHeart>5){
@@ -123,6 +165,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
             grupoHeartRate[contadorActualHeart] = (int)sensorEvent.values[0];
             contadorActualHeart++;
         }
+
+
+
 
     }
 

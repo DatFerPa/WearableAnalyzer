@@ -39,7 +39,8 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
     private Sensor accelerometer;
 
     private String stringprueba1 =  "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
-    private float[][] floatprueba ={{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f}};
+    private float[][] floatpruebaSiCaida ={{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f}};
+    private float[][] floatpruebaNoCaida ={{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
 
 
 
@@ -99,28 +100,22 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
         linear_acceleration[1] = (float) (sensor.values[1] - gravity[1]);
         linear_acceleration[2] = (float) (sensor.values[2] - gravity[2]);
 
-        Log.d(TAG, "Datos del accelerometro: X: " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
+        Log.d(TAG, contador+" - "+"Datos del accelerometro: X: " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
 
         //aqui vamos a añadir un linear acceleration a la lista
         lst_linear_acc.add(linear_acceleration.clone());
 
-        if (contador >= 1) {
-
-            float[][] salida = new float[1][2];
-            interpreter.run(floatprueba,salida);
-
-
-            Log.d(TAG,salida.toString());
-            /*
+        if (contador >= 100) {
+            Log.d(TAG,String.valueOf(contador));
+            //crear el fichero
             crearFicheroCaidaNo();
-            lst_linear_acc = new ArrayList<>();
-            contador = 1;
-
-             */
-
         } else {
             contador++;
         }
+    }
+
+    private int averiguarCaida(float[][] args){
+        return (args[0][0] >= args[0][1])?0:1;
     }
 
     @Override
