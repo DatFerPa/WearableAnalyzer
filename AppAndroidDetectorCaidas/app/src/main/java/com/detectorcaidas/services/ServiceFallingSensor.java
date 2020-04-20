@@ -20,6 +20,9 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.detectorcaidas.MainActivity;
+import com.detectorcaidas.R;
+
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -148,6 +151,27 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                         intent1.putExtra("data","caida");
                         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
 
+                        //Notificacion
+                        int requestID = (int) System.currentTimeMillis();
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                        intent.setAction(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), requestID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.CANAL_NOTIFICACION_ID);
+                        notificationBuilder.setContentTitle("¿Se encuentra usted bien?");
+                        notificationBuilder.setContentText("Pulse para cancelar la llamada de emergencia");
+                        notificationBuilder.setSmallIcon(R.drawable.walkingicon);
+                        notificationBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
+                        notificationBuilder.setVibrate(new long[]{500,500});
+                        notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.walkingicon));
+                        notificationBuilder.setContentIntent(pendingIntent);
+                        Notification notification = notificationBuilder.build();
+
+                        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+                        notificationManagerCompat.notify(NOTIFICATION_ID, notification);
 
                     }
 
