@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
@@ -24,6 +25,7 @@ import android.widget.ImageButton;
 import com.detectorcaidas.services.ServiceFallingSensor;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView;
 
@@ -51,8 +53,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     public static boolean isTurnoEmpezado;
 
 
-
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+//luego borrar
+    BroadcastReceiver aa = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG,intent.getStringExtra("data"));
@@ -65,6 +67,20 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             }
         }
     };
+
+
+    public class MyBroadcastReceiver extends BroadcastReceiver {
+        private static final String TAG = "MyBroadcastReceiver";
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Broadcast que funciona¿?");
+            if("caida".equals(intent.getStringExtra("data"))) {
+                Log.d(TAG, "Broadcast que funciona que te cagas");
+            }
+
+        }
+    }
+    BroadcastReceiver broadcastReceiver = new MyBroadcastReceiver();
 
 
     @Override
@@ -85,10 +101,16 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(notificationChannel);
         }
-
+/*
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.detectorcaidas");
-        registerReceiver(broadcastReceiver,intentFilter);
+        Intent one =registerReceiver(broadcastReceiver,intentFilter);
+
+ */
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.detectorcaidas");
+        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver, filter);
 
         pedirPermisos();
 
@@ -111,14 +133,29 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     }
 
+
+
+    private void prepareAppInFall(){
+        Log.d(TAG,"prepareAppOnFall");
+        botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
+        stopService(intentService);
+    }
+
     @Override
     protected void onStart() {
+        Log.d(TAG,"on Start");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         onpause = false;
         Bundle extras = getIntent().getExtras();
         if(isTurnoEmpezado){
             botonTurno.setText(R.string.finalizar_turno);
-            onItemSelected(0);
+            top_navigation_drawer.setCurrentItem(0,false);
         }
         if(extras != null && extras.getInt(ServiceFallingSensor.FUERA)==ServiceFallingSensor.ESTAS_FUERA_DE_LA_PRINCIPAL){
             prepareAppInFall();
@@ -128,18 +165,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }else{
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
         }
-        super.onStart();
-    }
 
-    private void prepareAppInFall(){
-        Log.d(TAG,"prepareAppOnFall");
-        botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
-        stopService(intentService);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         SharedPreferences sharedPreferences = this.getSharedPreferences(
                 getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
     }

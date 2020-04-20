@@ -32,6 +32,8 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import org.tensorflow.lite.Interpreter;
 
 public class ServiceFallingSensor extends Service implements SensorEventListener {
@@ -141,8 +143,10 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     Log.d(TAG,"Si me he caido");
                     //Modificar por comprobacion del pulso
                     if(true){
-
-
+                        Intent intent1 = new Intent();
+                        intent1.setAction("com.detectorcaidas");
+                        intent1.putExtra("data","caida");
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
 
 
                     }
@@ -153,7 +157,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
                 }else{
                     Log.d(TAG,"No me he caido");
-
+                    Intent intent1 = new Intent();
+                    intent1.setAction("com.detectorcaidas");
+                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
 
                 }
 
