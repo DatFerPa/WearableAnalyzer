@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.detectorcaidas.services.ServiceFallingSensor;
@@ -38,6 +39,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private WearableNavigationDrawerView top_navigation_drawer;
     private String[] arrayViews = {"Inicio", "Turno","Cerrar sesión"};
     private ImageButton botonInicio;
+    private Button botonTurno;
     private View layoutInicio;
     private View layoutTurno;
     private View layoutLogout;
@@ -84,6 +86,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("com.detectorcaidas");
+        registerReceiver(broadcastReceiver,intentFilter);
+
         pedirPermisos();
 
         setContentView(R.layout.activity_main);
@@ -94,6 +100,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         top_navigation_drawer.addOnItemSelectedListener(this);
         botonInicio = findViewById(R.id.botonInicial);
         botonInicio.setColorFilter(Color.GREEN);
+        botonTurno = findViewById(R.id.buttonTurno);
         layoutTurno = findViewById(R.id.include_layout_turno);
         layoutInicio = findViewById(R.id.include_layout_inicio);
         layoutLogout = findViewById(R.id.include_layout_logout);
@@ -106,12 +113,13 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     @Override
     protected void onStart() {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.detectorcaidas");
-        registerReceiver(broadcastReceiver,intentFilter);
+
         onpause = false;
-        Log.d(TAG,"onstart");
         Bundle extras = getIntent().getExtras();
+        if(isTurnoEmpezado){
+            botonTurno.setText(R.string.finalizar_turno);
+            onItemSelected(0);
+        }
         if(extras != null && extras.getInt(ServiceFallingSensor.FUERA)==ServiceFallingSensor.ESTAS_FUERA_DE_LA_PRINCIPAL){
             prepareAppInFall();
         }
@@ -127,7 +135,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         Log.d(TAG,"prepareAppOnFall");
         botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
         stopService(intentService);
-        onItemSelected(0);
     }
 
     @Override
@@ -154,9 +161,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
 
-
-
-
     @Override
     public void onItemSelected(int pos) {
 
@@ -176,13 +180,20 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }
     }
 
+
+
     public void clickButtonInicio(View view) {
 
         if(isTurnoEmpezado && caidaBool){
+            /*
+                Aqui va a ir la movida de que si hay caida, pase x tiempo tengamos
+                que aceptar que estamos bien para para la cuenta a atras y el aviso al
+                servidor o lo que se que hagamos.
+             */
+
 
         }
     }
-
 
 
     public void clickButtonTurno(View view){
@@ -193,6 +204,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }else{
             //quitar el service
             stopService(intentService);
+            botonTurno.setText(R.string.empezar_turno);
 
         }
 
@@ -260,11 +272,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     @Override
     protected void onPause() {
-        Log.d(TAG,"pause");
         onpause = true;
-        unregisterReceiver(broadcastReceiver);
         super.onPause();
     }
 
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
+    }
 }
 

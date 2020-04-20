@@ -78,8 +78,13 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
     @Override
     protected void onPause() {
         super.onPause();
-        //unregisterReceiver(broadcastReceiver);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        //unregisterReceiver(broadcastReceiver);
+        super.onDestroy();
     }
 
     @Override
@@ -100,7 +105,7 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
         MainActivity.intentService = new Intent(this, ServiceFallingSensor.class);
         startService(MainActivity.intentService);
 
-
+        MainActivity.isTurnoEmpezado = true;
 
         finish();
     }
@@ -128,6 +133,7 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
             @Override
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(getApplicationContext(),"Fallo en el servidor. Intentelo más tarde",Toast.LENGTH_LONG).show();
+                finish();
             }
         }){
             @Override

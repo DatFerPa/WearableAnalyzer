@@ -70,7 +70,15 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //Crear el interpreter
-        inicializarInterpreter();
+        try{
+            AssetFileDescriptor fileDescriptor = getApplication().getAssets().openFd("converted_model.tflite");
+            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+            FileChannel fileChannel = inputStream.getChannel();
+            MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY,fileDescriptor.getStartOffset(),fileDescriptor.getDeclaredLength());
+            interpreter = new Interpreter(mappedByteBuffer);
+        }catch(IOException e){
+            Log.e(TAG,e.getMessage());
+        }
         contadorActualAccel =1;
         contadorActualHeart = 0;
         //Creacion de cosas relacionadas con los sensores
@@ -88,19 +96,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         return super.onStartCommand(intent, flags, startId);
     }
 
-
-    private void inicializarInterpreter(){
-        AssetFileDescriptor fileDescriptor = null;
-        try{
-            fileDescriptor = getApplication().getAssets().openFd("converted_model.tflite");
-            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-            FileChannel fileChannel = inputStream.getChannel();
-            MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY,fileDescriptor.getStartOffset(),fileDescriptor.getDeclaredLength());
-            interpreter = new Interpreter(mappedByteBuffer);
-        }catch(IOException e){
-            Log.e(TAG,e.getMessage());
-        }
-    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -144,6 +139,14 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
                 if(esCaida){
                     Log.d(TAG,"Si me he caido");
+                    //Modificar por comprobacion del pulso
+                    if(true){
+
+
+
+
+                    }
+
                     /*
                         Hay que mirar las pulsaciones que tenemos guardadas
                      */

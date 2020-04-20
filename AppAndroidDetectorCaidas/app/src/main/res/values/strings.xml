@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DetectorCaidas</string>
+    <string name="app_name">Hombre muerto</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
@@ -28,6 +28,7 @@
     <string name="title_activity_cancell_call">ActivityCancellCall</string>
     <string name="pregunta_llamar_igualmente">¿Desea realizar la llamada de emergia igualmente?</string>
     <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_main">MainActivity</string>
 
     <string name="empezar_turno">Empezar turno</string>
     <string name="finalizar_turno">Finalizar turno</string>
