@@ -68,11 +68,9 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
 
 
 
-
         // Enables Always-on
         setAmbientEnabled();
     }
-
 
 
     @Override
@@ -83,7 +81,7 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
 
     @Override
     protected void onDestroy() {
-        //unregisterReceiver(broadcastReceiver);
+        // LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
 

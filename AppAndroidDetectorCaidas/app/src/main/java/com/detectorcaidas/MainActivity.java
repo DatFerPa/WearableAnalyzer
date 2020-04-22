@@ -1,6 +1,5 @@
 package com.detectorcaidas;
 
-
 import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -13,7 +12,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
@@ -21,7 +19,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-
 import com.detectorcaidas.services.ServiceFallingSensor;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -46,38 +43,22 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private View layoutTurno;
     private View layoutLogout;
 
-
     public static Intent intentService;
 
-
     public static boolean isTurnoEmpezado;
-
-
-//luego borrar
-    BroadcastReceiver aa = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG,intent.getStringExtra("data"));
-            if(intent.getStringExtra("data").equals("caida")) {
-                prepareAppInFall();
-            }
-            if(intent.getStringExtra("data").equals("recuperar")){
-                intentService = new Intent(getApplicationContext(), ServiceFallingSensor.class);
-                startService(intentService);
-            }
-        }
-    };
-
 
     public class MyBroadcastReceiver extends BroadcastReceiver {
         private static final String TAG = "MyBroadcastReceiver";
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Broadcast que funciona¿?");
             if("caida".equals(intent.getStringExtra("data"))) {
-                Log.d(TAG, "Broadcast que funciona que te cagas");
+                prepareAppInFall();
             }
-
+            if("recuperar".equals(intent.getStringExtra("data"))){
+                botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
+                intentService = new Intent(getApplicationContext(), ServiceFallingSensor.class);
+                //startService(intentService);
+            }
         }
     }
     BroadcastReceiver broadcastReceiver = new MyBroadcastReceiver();
@@ -101,12 +82,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(notificationChannel);
         }
-/*
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.detectorcaidas");
-        Intent one =registerReceiver(broadcastReceiver,intentFilter);
 
- */
+
 
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.detectorcaidas");
@@ -139,6 +116,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         Log.d(TAG,"prepareAppOnFall");
         botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
         stopService(intentService);
+        onItemSelected(0);
     }
 
     @Override
@@ -150,7 +128,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     @Override
     protected void onResume() {
         super.onResume();
-
+        Log.d(TAG,"on Resume");
         onpause = false;
         Bundle extras = getIntent().getExtras();
         if(isTurnoEmpezado){
@@ -166,22 +144,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
         }
 
-        SharedPreferences sharedPreferences = this.getSharedPreferences(
-                getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
     }
 
     private void pedirPermisos(){
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                != PackageManager.PERMISSION_GRANTED &&
-        ContextCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)
-                != PackageManager.PERMISSION_GRANTED  &&
-                ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
-                        != PackageManager.PERMISSION_GRANTED ) {
-
-            String[] permisos = {Manifest.permission.READ_CONTACTS,Manifest.permission.SEND_SMS,
-                    Manifest.permission.CALL_PHONE,Manifest.permission.READ_PHONE_STATE};
+        if (ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
+                        != PackageManager.PERMISSION_GRANTED
+                || ContextCompat.checkSelfPermission(this,Manifest.permission.BODY_SENSORS)
+                != PackageManager.PERMISSION_GRANTED) {
+            String[] permisos = {Manifest.permission.READ_PHONE_STATE,Manifest.permission.BODY_SENSORS};
             requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
         }
     }
@@ -207,7 +177,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
 
-
     public void clickButtonInicio(View view) {
 
         if(isTurnoEmpezado && caidaBool){
@@ -217,23 +186,23 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                 servidor o lo que se que hagamos.
              */
 
-
         }
     }
 
 
     public void clickButtonTurno(View view){
-        //movidas para empezar y fnalizar el turno
-        if(!isTurnoEmpezado) {
+        if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this,Manifest.permission.BODY_SENSORS)
+                == PackageManager.PERMISSION_GRANTED && !isTurnoEmpezado ) {
             Intent intent = new Intent(this, ListTurnoActivity.class);
             startActivity(intent);
         }else{
             //quitar el service
             stopService(intentService);
+            isTurnoEmpezado = false;
             botonTurno.setText(R.string.empezar_turno);
-
         }
-
     }
 
 
@@ -298,13 +267,14 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     @Override
     protected void onPause() {
+        Log.d(TAG,"on pause");
         onpause = true;
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
-        unregisterReceiver(broadcastReceiver);
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
 }

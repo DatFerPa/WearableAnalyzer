@@ -24,7 +24,6 @@ import java.util.Map;
 public class LoginActivity extends WearableActivity {
     private static final String TAG = "LoginActivity";
 
-    private TextView mTextView;
     private TextView textoMaquinista;
     private ImageButton botonLogin;
 
@@ -43,7 +42,6 @@ public class LoginActivity extends WearableActivity {
             setContentView(R.layout.activity_login);
             textoMaquinista = findViewById(R.id.textMaquinista);
             botonLogin = findViewById(R.id.buttonLogin);
-            mTextView = (TextView) findViewById(R.id.text);
 
             // Enables Always-on
             setAmbientEnabled();
@@ -77,7 +75,7 @@ public class LoginActivity extends WearableActivity {
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                         }else{
-                            Toast.makeText(getApplicationContext(),"El maquinista no se encunetra en el sistema",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext(),"El maquinista no se encuentra en el sistema",Toast.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {

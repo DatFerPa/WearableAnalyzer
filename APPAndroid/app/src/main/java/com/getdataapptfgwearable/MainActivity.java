@@ -121,7 +121,7 @@ public class MainActivity extends WearableActivity  {
             Log.d(TAG,"Empezando la lectura de datos si caida");
             activo = true;
             botonNo.setVisibility(View.INVISIBLE);
-            intent = new Intent(this, ServiceSensorNoMovimiento.class);
+            intent = new Intent(this, ServiceSensorSiMovimiento.class);
             startService(intent);
         }
 

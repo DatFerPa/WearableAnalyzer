@@ -1,6 +1,5 @@
 package com.detectorcaidas.services;
 
-
 import android.Manifest;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -19,11 +18,8 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.detectorcaidas.MainActivity;
 import com.detectorcaidas.R;
-
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
@@ -44,7 +40,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     private static final String TAG = "ServiceFallingSensor";
 
     private String prueba = "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
-
+    private boolean si = false;
     //sensores
     private SensorManager sensorManager;
     //acelerometro
@@ -59,7 +55,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     int contadorActualAccel;
     int contadorActualHeart;
     public final static int ESTAS_FUERA_DE_LA_PRINCIPAL = 1;
-    public final static String SERVICIO = "servicio";
     public final static String FUERA = "fueraPrincipal";
     private String accel_para_enviar = "";
     private CountDownTimer tiempoHastaLlamada;
@@ -97,7 +92,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         //Crear el sensor del ratio del corazón
         sensorHeart = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
         sensorManager.registerListener(this,sensorHeart,SensorManager.SENSOR_DELAY_FASTEST);
-
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -128,7 +122,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
             //aqui vamos a añadir un linear acceleration a la lista
             lst_linear_acc.add(linear_acceleration.clone());
-            if(contadorActualAccel >= 100){
+
+            if(contadorActualAccel >= 1000 && si== false){
+                si =true;
                 float[][] salida = new float[1][2];
                 float[][] entrada = new float[100][];
                 int cont = 0;
@@ -142,19 +138,23 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 contadorActualAccel = 1;
                 boolean esCaida = salida[0][0] >= salida[0][1]?true:false;
 
-                if(esCaida){
+                if(contadorActualAccel >1000){
                     Log.d(TAG,"Si me he caido");
                     //Modificar por comprobacion del pulso
-                    if(true){
-                        Intent intent1 = new Intent();
-                        intent1.setAction("com.detectorcaidas");
-                        intent1.putExtra("data","caida");
-                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
+                    if(rateHeartNormal()==false){
 
-                        //Notificacion
+                        Log.d(TAG,"Caida detectada con latidos fuera de lo normal");
+                        MainActivity.caidaBool = true;
+
+                        //Broadcast movida
+                        Intent intentBroadcast = new Intent();
+                        intentBroadcast.setAction("com.detectorcaidas");
+                        intentBroadcast.putExtra("data","caida");
+                        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intentBroadcast);
+
+                        //Creando las notificaciones
                         int requestID = (int) System.currentTimeMillis();
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                         intent.setAction(Intent.ACTION_MAIN);
                         intent.addCategory(Intent.CATEGORY_LAUNCHER);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -162,7 +162,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
                         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getApplicationContext(), MainActivity.CANAL_NOTIFICACION_ID);
                         notificationBuilder.setContentTitle("¿Se encuentra usted bien?");
-                        notificationBuilder.setContentText("Pulse para cancelar la llamada de emergencia");
+                        notificationBuilder.setContentText("Pulse para cancelar el freno de emergencia");
                         notificationBuilder.setSmallIcon(R.drawable.walkingicon);
                         notificationBuilder.setPriority(NotificationCompat.PRIORITY_MAX);
                         notificationBuilder.setVibrate(new long[]{500,500});
@@ -173,18 +173,45 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
                         notificationManagerCompat.notify(NOTIFICATION_ID, notification);
 
+                        //cambiar para que el tiempo sea menor
+                        tiempoHastaLlamada  = new CountDownTimer(30000, 500) {
+                            @Override
+                            public void onTick(long millisUntilFinished) {
+                                Log.d(TAG, "time to finish: " + millisUntilFinished);
+                            }
+
+                            @Override
+                            public void onFinish() {
+                                if (MainActivity.caidaBool) {
+                                    Log.d(TAG, "movidas de llamadas");
+                                    makeCallAndBrake();
+                                    MainActivity.caidaBool = false;
+                                }
+                            }
+                        };
+
+                        if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState() == Lifecycle.State.CREATED) {
+                            Log.d(TAG, "tamos fuera de la app");
+                            Intent intent2 = new Intent(getApplicationContext(), MainActivity.class);
+                            intent2.putExtra(FUERA, ESTAS_FUERA_DE_LA_PRINCIPAL);
+                            intent2.setAction(Intent.ACTION_MAIN);
+                            intent2.addCategory(Intent.CATEGORY_LAUNCHER);
+                            intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent2);
+                        }else {
+                            Log.d(TAG, "seguinmos dentro de la app");
+                            Intent intent1 = new Intent();
+                            intent1.setAction("com.detectorcaidas");
+                            intent1.putExtra("data", "caida");
+                            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
+                        }
+                        tiempoHastaLlamada.start();
                     }
-
-                    /*
-                        Hay que mirar las pulsaciones que tenemos guardadas
-                     */
-
                 }else{
                     Log.d(TAG,"No me he caido");
                     Intent intent1 = new Intent();
                     intent1.setAction("com.detectorcaidas");
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
-
                 }
 
             }else {
@@ -195,11 +222,10 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
             if(contadorActualHeart>5){
                 contadorActualHeart = 0;
             }
+            Log.d(TAG,"Latidos corazon: "+(int)sensorEvent.values[0]);
             grupoHeartRate[contadorActualHeart] = (int)sensorEvent.values[0];
             contadorActualHeart++;
         }
-
-
 
 
     }
@@ -209,7 +235,22 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
     }
 
+    private boolean rateHeartNormal(){
+        int cont = 1;
+        double media =0;
+        for(int oneRate: grupoHeartRate){
+            if(oneRate!=0) {
+                media += oneRate;
+                cont++;
+            }
+        }
+        media = media/cont;
+        Log.d(TAG,"Latidos corazon de media entre "+cont+"   ---->  "+media);
+        Toast.makeText(getApplicationContext(),String.valueOf(media),Toast.LENGTH_SHORT).show();
 
+        return ((media<30)||(media>100))?false:true;
+
+    }
 
 
     @Override
@@ -219,20 +260,23 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         super.onDestroy();
     }
 
-    private void makeCallAndSMS(){
+    private void makeCallAndBrake(){
         Log.d(TAG, "Realizar llamada desde el wearable");
+
         Intent callIntent = new Intent(Intent.ACTION_CALL);
         callIntent.setData(Uri.parse("tel:648738746"));
+
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+            Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
             startActivity(callIntent);
         }else{
             Toast.makeText(getApplicationContext(),"No se ha podido realizar la llamada",Toast.LENGTH_LONG).show();
         }
+
         Intent intent1 = new Intent();
         intent1.setAction("com.detectorcaidas");
         intent1.putExtra("data","recuperar");
-        sendBroadcast(intent1);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
     }
 
 
