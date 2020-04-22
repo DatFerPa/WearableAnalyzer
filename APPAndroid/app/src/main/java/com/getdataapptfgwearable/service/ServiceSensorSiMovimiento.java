@@ -29,6 +29,8 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
+    private int contador;
+
     public ServiceSensorSiMovimiento() {
     }
 
@@ -41,6 +43,15 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
     @Override
     public void onSensorChanged(SensorEvent sensor) {
         double alpha = 0.8;
+
+        if(contador>=1000){
+            contador = 0;
+            Log.d(TAG,"---------------------------------- SE HAN HECHO 1000 LECTURAS");
+
+            lst_linear_acc = new ArrayList<>();
+        }
+
+
         gravity[0] = alpha * gravity[0] + (1 - alpha) * sensor.values[0];
         gravity[1] = alpha * gravity[1] + (1 - alpha) * sensor.values[1];
         gravity[2] = alpha * gravity[2] + (1 - alpha) * sensor.values[2];
@@ -49,10 +60,11 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
         linear_acceleration[1] = (float) (sensor.values[1] - gravity[1]);
         linear_acceleration[2] = (float) (sensor.values[2] - gravity[2]);
 
-        Log.d(TAG, "Datos del accelerometro: X: " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
+        Log.d(TAG, "Datos del accelerometro: "+ contador+": " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
 
         //aqui vamos a añadir un linear acceleration a la lista
         lst_linear_acc.add(linear_acceleration.clone());
+        contador++;
     }
 
     @Override
@@ -65,7 +77,7 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-
+        contador = 0;
         return super.onStartCommand(intent, flags, startId);
     }
 

@@ -40,7 +40,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     private static final String TAG = "ServiceFallingSensor";
 
     private String prueba = "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
-    private boolean si = false;
     //sensores
     private SensorManager sensorManager;
     //acelerometro
@@ -79,7 +78,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         }catch(IOException e){
             Log.e(TAG,e.getMessage());
         }
-        contadorActualAccel =1;
+        contadorActualAccel =0;
         contadorActualHeart = 0;
         //Creacion de cosas relacionadas con los sensores
         grupoHeartRate = new int[5];
@@ -99,32 +98,8 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         double alpha = 0.8;
-
-        /*
-            Hay que poner un diferenciador entre el sensor del acelerometro y el del pulso
-         */
-
         if(sensorEvent.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
-
-            gravity[0] = alpha * gravity[0] + (1 - alpha) * sensorEvent.values[0];
-            gravity[1] = alpha * gravity[1] + (1 - alpha) * sensorEvent.values[1];
-            gravity[2] = alpha * gravity[2] + (1 - alpha) * sensorEvent.values[2];
-
-            linear_acceleration[0] = (float) (sensorEvent.values[0] - gravity[0]);
-            linear_acceleration[1] = (float) (sensorEvent.values[1] - gravity[1]);
-            linear_acceleration[2] = (float) (sensorEvent.values[2] - gravity[2]);
-
-            if(contadorActualAccel == 0){
-                accel_para_enviar = accel_para_enviar + linear_acceleration[0]+";"+linear_acceleration[1]+";"+linear_acceleration[2];
-            }else{
-                accel_para_enviar = ":"+accel_para_enviar + linear_acceleration[0]+";"+linear_acceleration[1]+";"+linear_acceleration[2];
-            }
-
-            //aqui vamos a añadir un linear acceleration a la lista
-            lst_linear_acc.add(linear_acceleration.clone());
-
-            if(contadorActualAccel >= 1000 && si== false){
-                si =true;
+            if(contadorActualAccel >= 100){
                 float[][] salida = new float[1][2];
                 float[][] entrada = new float[100][];
                 int cont = 0;
@@ -135,10 +110,10 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 interpreter.run(entrada,salida);
                 Log.d(TAG,"Salida:  CaidaSi: "+salida[0][0]+" --  CaidaNo: "+salida[0][1]);
                 lst_linear_acc = new ArrayList<>();
-                contadorActualAccel = 1;
+                contadorActualAccel = 0;
                 boolean esCaida = salida[0][0] >= salida[0][1]?true:false;
 
-                if(contadorActualAccel >1000){
+                if(esCaida){
                     Log.d(TAG,"Si me he caido");
                     //Modificar por comprobacion del pulso
                     if(rateHeartNormal()==false){
@@ -215,6 +190,20 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 }
 
             }else {
+                gravity[0] = alpha * gravity[0] + (1 - alpha) * sensorEvent.values[0];
+                gravity[1] = alpha * gravity[1] + (1 - alpha) * sensorEvent.values[1];
+                gravity[2] = alpha * gravity[2] + (1 - alpha) * sensorEvent.values[2];
+
+                linear_acceleration[0] = (float) (sensorEvent.values[0] - gravity[0]);
+                linear_acceleration[1] = (float) (sensorEvent.values[1] - gravity[1]);
+                linear_acceleration[2] = (float) (sensorEvent.values[2] - gravity[2]);
+                Log.d(TAG, "Datos del accelerometro: "+ contadorActualAccel+": " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
+                if(contadorActualAccel == 0){
+                    accel_para_enviar = accel_para_enviar + linear_acceleration[0]+";"+linear_acceleration[1]+";"+linear_acceleration[2];
+                }else{
+                    accel_para_enviar = ":"+accel_para_enviar + linear_acceleration[0]+";"+linear_acceleration[1]+";"+linear_acceleration[2];
+                }
+                lst_linear_acc.add(linear_acceleration.clone());
                 contadorActualAccel++;
             }
 
@@ -248,7 +237,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         Log.d(TAG,"Latidos corazon de media entre "+cont+"   ---->  "+media);
         Toast.makeText(getApplicationContext(),String.valueOf(media),Toast.LENGTH_SHORT).show();
 
-        return ((media<30)||(media>100))?false:true;
+        return ((media<60)||(media>100))?false:true;
 
     }
 

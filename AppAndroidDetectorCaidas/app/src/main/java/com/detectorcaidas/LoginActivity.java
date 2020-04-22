@@ -49,10 +49,6 @@ public class LoginActivity extends WearableActivity {
     }
 
     public void onClickLogin(View view) {
-        //borrar esto luego
-        Intent intent = new Intent(getApplicationContext(),MainActivity.class);
-        startActivity(intent);
-
 
         botonLogin.setClickable(false);
         textoMaquinista.setClickable(false);
