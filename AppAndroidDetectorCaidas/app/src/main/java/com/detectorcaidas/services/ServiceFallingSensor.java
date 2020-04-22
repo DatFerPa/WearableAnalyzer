@@ -18,6 +18,8 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.detectorcaidas.ActivityWaitForHeart;
 import com.detectorcaidas.MainActivity;
 import com.detectorcaidas.R;
 import java.io.FileInputStream;
@@ -98,22 +100,27 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         double alpha = 0.8;
-        if(sensorEvent.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
-            if(contadorActualAccel >= 100){
+        if(sensorEvent.sensor.getType()==Sensor.TYPE_ACCELEROMETER && ActivityWaitForHeart.isWaitingForHeart == false){
+            if(contadorActualAccel >= 2000){
                 float[][] salida = new float[1][2];
-                float[][] entrada = new float[100][];
+                float[][] entrada = new float[2000][];
                 int cont = 0;
                 for(float[] bloque:lst_linear_acc){
                     entrada[cont]=bloque;
                     cont++;
                 }
+                /*
                 interpreter.run(entrada,salida);
                 Log.d(TAG,"Salida:  CaidaSi: "+salida[0][0]+" --  CaidaNo: "+salida[0][1]);
+
+                 */
+                Log.d(TAG,"mil aceleraciones");
+                rateHeartNormal();
                 lst_linear_acc = new ArrayList<>();
                 contadorActualAccel = 0;
                 boolean esCaida = salida[0][0] >= salida[0][1]?true:false;
 
-                if(esCaida){
+                if(false){
                     Log.d(TAG,"Si me he caido");
                     //Modificar por comprobacion del pulso
                     if(rateHeartNormal()==false){
@@ -184,9 +191,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     }
                 }else{
                     Log.d(TAG,"No me he caido");
-                    Intent intent1 = new Intent();
-                    intent1.setAction("com.detectorcaidas");
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
                 }
 
             }else {
@@ -197,7 +201,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 linear_acceleration[0] = (float) (sensorEvent.values[0] - gravity[0]);
                 linear_acceleration[1] = (float) (sensorEvent.values[1] - gravity[1]);
                 linear_acceleration[2] = (float) (sensorEvent.values[2] - gravity[2]);
-                Log.d(TAG, "Datos del accelerometro: "+ contadorActualAccel+": " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
+                Log.d(TAG, "Datos del accelerometro: "+ contadorActualAccel+" ---  X: " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
                 if(contadorActualAccel == 0){
                     accel_para_enviar = accel_para_enviar + linear_acceleration[0]+";"+linear_acceleration[1]+";"+linear_acceleration[2];
                 }else{
@@ -207,8 +211,15 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 contadorActualAccel++;
             }
 
-        }else{
-            if(contadorActualHeart>5){
+        }else if(sensorEvent.sensor.getType()==Sensor.TYPE_HEART_RATE){
+            if(ActivityWaitForHeart.isWaitingForHeart){
+                Intent intent1 = new Intent();
+                intent1.setAction("com.detectorcaidas");
+                intent1.putExtra("data", "listosParaTurno");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
+
+            }
+            if(contadorActualHeart>=5){
                 contadorActualHeart = 0;
             }
             Log.d(TAG,"Latidos corazon: "+(int)sensorEvent.values[0]);
@@ -225,7 +236,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     }
 
     private boolean rateHeartNormal(){
-        int cont = 1;
+        int cont = 0;
         double media =0;
         for(int oneRate: grupoHeartRate){
             if(oneRate!=0) {
@@ -233,6 +244,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 cont++;
             }
         }
+        cont = (cont==0)?1:cont;
         media = media/cont;
         Log.d(TAG,"Latidos corazon de media entre "+cont+"   ---->  "+media);
         Toast.makeText(getApplicationContext(),String.valueOf(media),Toast.LENGTH_SHORT).show();

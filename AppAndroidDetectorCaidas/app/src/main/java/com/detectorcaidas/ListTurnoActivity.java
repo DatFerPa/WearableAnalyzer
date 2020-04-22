@@ -37,21 +37,6 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
     private List<Turno> turnos;
 
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG,intent.getStringExtra("data"));
-            if(intent.getStringExtra("data").equals("finalizar")) {
-                unregisterReceiver(this);
-                finish();
-                Intent intent1 = new Intent();
-                intent1.setAction("com.detectorcaidas");
-                intent1.putExtra("data", "caida");
-                sendBroadcast(intent1);
-            }
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,8 +50,6 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
         wrView.setLayoutManager(new WearableLinearLayoutManager(this,customScrollingLayoutCallbacks));
         turnoAdapter = new TurnoAdapter(turnos,this);
         wrView.setAdapter(turnoAdapter);
-
-
 
         // Enables Always-on
         setAmbientEnabled();
@@ -90,22 +73,25 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
         /*
             hacer cosa con los shared preferencesy guardar el turnos actual
          */
+
         SharedPreferences sharedPreferences = getSharedPreferences(
                 getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getString(R.string.shared_nombre_turno),turnos.get(position).getNombre());
         editor.putString(getString(R.string.shared_nombre_tren),turnos.get(position).getTren());
         editor.commit();
-        MainActivity.isTurnoEmpezado = true;
+
         /*
             Creamos el service para la mainactivity
          */
-        MainActivity.intentService = new Intent(this, ServiceFallingSensor.class);
-        startService(MainActivity.intentService);
 
-        MainActivity.isTurnoEmpezado = true;
 
         finish();
+
+        Intent intentWaitHeart = new Intent(getApplicationContext(),ActivityWaitForHeart.class);
+        startActivity(intentWaitHeart);
+
+
     }
 
     private List<Turno> getTurnos() {

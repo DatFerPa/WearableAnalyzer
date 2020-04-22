@@ -6,7 +6,6 @@
 
     <uses-feature android:name="android.hardware.type.watch" />
 
-
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -30,9 +29,12 @@
             android:value="true" />
 
         <activity
-            android:name=".ListTurnoActivity"
-            android:label="@string/title_activity_list_turno">
+            android:name=".ActivityWaitForHeart"
+            android:label="@string/title_activity_wait_for_heart">
         </activity>
+        <activity
+            android:name=".ListTurnoActivity"
+            android:label="@string/title_activity_list_turno"></activity>
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name">
@@ -42,6 +44,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service
             android:name=".services.ServiceFallingSensor"
             android:enabled="true"
@@ -49,9 +52,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="@string/title_activity_main">
-
-        </activity>
+            android:label="@string/title_activity_main"></activity>
     </application>
 
 </manifest>

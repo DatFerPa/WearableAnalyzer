@@ -130,6 +130,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         super.onResume();
         Log.d(TAG,"on Resume");
         onpause = false;
+        ActivityWaitForHeart.isWaitingForHeart = false;
         Bundle extras = getIntent().getExtras();
         if(isTurnoEmpezado){
             botonTurno.setText(R.string.finalizar_turno);

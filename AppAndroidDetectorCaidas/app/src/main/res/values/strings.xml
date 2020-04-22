@@ -37,6 +37,8 @@
 
     <string name="text_logout">Cerrar sesión</string>
     <string name="title_activity_list_turno">ListTurnoActivity</string>
-    <string name ="shared_maquinista_por_defecto">Error</string>
+    <string name="shared_maquinista_por_defecto">Error</string>
+    <string name="title_activity_wait_for_heart">ActivityWaitForHeart</string>
+    <string name="text_wait_4_heart">Espere hasta que la aplicación mida sus pulsaciones</string>
 
 </resources>
