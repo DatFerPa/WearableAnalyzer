@@ -53,14 +53,9 @@ public class ActivityWaitForHeart extends WearableActivity {
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver, filter);
         MainActivity.intentService = new Intent(this, ServiceFallingSensor.class);
         startService(MainActivity.intentService);
-
         imagenCorazon = findViewById(R.id.imagenCorazon);
         AnimationDrawable animation = (AnimationDrawable)imagenCorazon.getDrawable();
         animation.start();
-
-
-
-        // Enables Always-on
         setAmbientEnabled();
 
     }

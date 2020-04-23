@@ -64,30 +64,18 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
 
     @Override
     protected void onDestroy() {
-        // LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
 
     @Override
     public void onClickElemento(int position){
-        /*
-            hacer cosa con los shared preferencesy guardar el turnos actual
-         */
-
         SharedPreferences sharedPreferences = getSharedPreferences(
                 getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getString(R.string.shared_nombre_turno),turnos.get(position).getNombre());
         editor.putString(getString(R.string.shared_nombre_tren),turnos.get(position).getTren());
         editor.commit();
-
-        /*
-            Creamos el service para la mainactivity
-         */
-
-
         finish();
-
         Intent intentWaitHeart = new Intent(getApplicationContext(),ActivityWaitForHeart.class);
         startActivity(intentWaitHeart);
 

@@ -19,6 +19,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
 import com.detectorcaidas.services.ServiceFallingSensor;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -54,10 +56,9 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             if("caida".equals(intent.getStringExtra("data"))) {
                 prepareAppInFall();
             }
-            if("recuperar".equals(intent.getStringExtra("data"))){
+            if("finalizar".equals(intent.getStringExtra("data"))){
                 botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
-                intentService = new Intent(getApplicationContext(), ServiceFallingSensor.class);
-                //startService(intentService);
+                botonTurno.setText(R.string.finalizar_turno);
             }
         }
     }
@@ -179,14 +180,12 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
 
     public void clickButtonInicio(View view) {
-
         if(isTurnoEmpezado && caidaBool){
-            /*
-                Aqui va a ir la movida de que si hay caida, pase x tiempo tengamos
-                que aceptar que estamos bien para para la cuenta a atras y el aviso al
-                servidor o lo que se que hagamos.
-             */
-
+            MainActivity.intentService = new Intent(this, ServiceFallingSensor.class);
+            startService(MainActivity.intentService);
+            botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
+            caidaBool = false;
+            Toast.makeText(getApplicationContext(),"Cancelando frenos de emergencia",Toast.LENGTH_LONG).show();
         }
     }
 

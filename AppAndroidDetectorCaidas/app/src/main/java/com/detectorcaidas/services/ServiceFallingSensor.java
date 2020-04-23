@@ -112,7 +112,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 /*
                 interpreter.run(entrada,salida);
                 Log.d(TAG,"Salida:  CaidaSi: "+salida[0][0]+" --  CaidaNo: "+salida[0][1]);
-
                  */
                 Log.d(TAG,"mil aceleraciones");
                 rateHeartNormal();
@@ -122,9 +121,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
                 if(false){
                     Log.d(TAG,"Si me he caido");
-                    //Modificar por comprobacion del pulso
                     if(rateHeartNormal()==false){
-
                         Log.d(TAG,"Caida detectada con latidos fuera de lo normal");
                         MainActivity.caidaBool = true;
 
@@ -165,7 +162,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                             @Override
                             public void onFinish() {
                                 if (MainActivity.caidaBool) {
-                                    Log.d(TAG, "movidas de llamadas");
+                                    Log.d(TAG, "Activando frenos");
                                     makeCallAndBrake();
                                     MainActivity.caidaBool = false;
                                 }
@@ -250,7 +247,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         Toast.makeText(getApplicationContext(),String.valueOf(media),Toast.LENGTH_SHORT).show();
 
         return ((media<60)||(media>100))?false:true;
-
     }
 
 
@@ -262,8 +258,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     }
 
     private void makeCallAndBrake(){
-        Log.d(TAG, "Realizar llamada desde el wearable");
-
+        Log.d(TAG, "Activando los frenos");
         Intent callIntent = new Intent(Intent.ACTION_CALL);
         callIntent.setData(Uri.parse("tel:648738746"));
 
@@ -273,10 +268,10 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         }else{
             Toast.makeText(getApplicationContext(),"No se ha podido realizar la llamada",Toast.LENGTH_LONG).show();
         }
-
+        MainActivity.isTurnoEmpezado = false;
         Intent intent1 = new Intent();
         intent1.setAction("com.detectorcaidas");
-        intent1.putExtra("data","recuperar");
+        intent1.putExtra("data","finalizar");
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
     }
 
