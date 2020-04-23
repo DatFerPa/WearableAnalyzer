@@ -6,7 +6,7 @@ import tensorflow as tf
 
 DATADIR = "D:\Git\WearableAnalyzer\TensorDetector"
 
-CATEGORIES = ["caida","nocaida"]
+CATEGORIES = ["simovimineto","nomovimiento"]
 training_data = []
 
 for category in CATEGORIES:

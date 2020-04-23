@@ -46,8 +46,8 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
 
         if(contador>=1000){
             contador = 0;
-            Log.d(TAG,"---------------------------------- SE HAN HECHO 1000 LECTURAS");
-
+            Log.d(TAG,"---------------------------------- SE HAN HECHO 1000 LECTURAS DE SI MOVIMIENTO");
+            crearFicheroCaidaSi();
             lst_linear_acc = new ArrayList<>();
         }
 
@@ -62,7 +62,6 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
 
         Log.d(TAG, "Datos del accelerometro: "+ contador+": " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
 
-        //aqui vamos a añadir un linear acceleration a la lista
         lst_linear_acc.add(linear_acceleration.clone());
         contador++;
     }
@@ -83,7 +82,7 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
 
     @Override
     public void onDestroy() {
-        Log.d(TAG,"Finalizando servicio caida si");
+        Log.d(TAG,"Finalizando servicio movimiento si");
         sensorManager.unregisterListener(this);
         super.onDestroy();
     }
@@ -95,18 +94,12 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
 
         Log.d(TAG,getApplicationContext().getFilesDir().getPath());
 
-        File fichero = new File(getApplicationContext().getFilesDir(),"caidasi"+System.currentTimeMillis()+".txt");
-        Log.d(TAG,"Guardando fichero de Si caida");
+        File fichero = new File(getApplicationContext().getFilesDir(),"movimientosi"+System.currentTimeMillis()+".txt");
+        Log.d(TAG,"Guardando fichero de Si Movimiento");
         try{
             BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-            //al reves
-            //int i = lst_linear_acc.size()-1;i>=lst_linear_acc.size()-iteracionesParaFichero;i--
-            for(int i = lst_linear_acc.size()-1000;i<=lst_linear_acc.size()-1;i++){
-
-                float[] datoConcreto = lst_linear_acc.get(i);
-                //Log.d(TAG,"Datos del accelerometro: X: "+datoConcreto[0]+" - Y: "+datoConcreto[1]+" - Z: "+datoConcreto[2]);
-                writer.write(datoConcreto[0]+";"+datoConcreto[1]+";"+datoConcreto[2]+"\n");
-
+            for (float[] a : lst_linear_acc) {
+                writer.write(a[0] + ";" + a[1] + ";" + a[2] + "\n");
             }
             writer.close();
         } catch (IOException e) {
