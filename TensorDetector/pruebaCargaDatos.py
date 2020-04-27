@@ -43,7 +43,7 @@ print(y)
 
 
 model = tf.keras.models.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape=(100, 3)))#un tipo de capa, investigar mas
+model.add(tf.keras.layers.Flatten(input_shape=(1000, 3)))#un tipo de capa, investigar mas
 model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))#128 neuronas en la capa , funcion de activacion rectificacion linear
 model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
 model.add(tf.keras.layers.Dense(2, activation=tf.nn.softmax))#esta va a ser la capa de salida y va a tener que tener el numero de neuronas, para la salida de la clasificacion, al estar con numeros del 0 al 9, son 10 neuronas
@@ -53,7 +53,7 @@ model.compile(optimizer='adam',loss='sparse_categorical_crossentropy',metrics=['
 
 model.fit(x,y,epochs=3)#le pasamos lo que queremos entrenar, recordar que epochs, son las iteraciuones a todo el modelo
 val_loss, val_acc = model.evaluate(x, y)
-model.save('modelo_caidas')
+model.save('modelo_movimientos')
 
 
 

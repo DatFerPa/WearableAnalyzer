@@ -44,17 +44,8 @@ public class ServiceSensorHeart extends Service implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         String texto = String.valueOf(event.values[0]);
         Log.d(TAG,texto);
-        /*
-        Intent intent1 = new Intent();
-        intent1.setAction("com.getdataapptfgwearable");
-        intent1.putExtra("data", texto);
-        sendBroadcast(intent1);
-
-         */
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {  }
 }

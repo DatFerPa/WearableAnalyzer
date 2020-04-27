@@ -31,20 +31,10 @@ import java.util.Map;
 public class MainActivity extends WearableActivity  {
 
     private static final String TAG = "MainActivity";
-
-    private int iteracionesParaFichero = 1000;
-    /*
-        Cosas para probar
-    */
-
-
     private boolean activo;
     private Button botonSi;
     private Button botonNo;
     private Intent intent;
-
-
-
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -54,19 +44,10 @@ public class MainActivity extends WearableActivity  {
         }
     };
 
-
-
-
-
-
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setAmbientEnabled();
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)!= PackageManager.PERMISSION_GRANTED){
             String[] permisos = {Manifest.permission.BODY_SENSORS};
@@ -82,13 +63,11 @@ public class MainActivity extends WearableActivity  {
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
     }
 
     public void onClickCaidaNo(View view) {
@@ -105,8 +84,6 @@ public class MainActivity extends WearableActivity  {
           intent = new Intent(this, ServiceSensorNoMovimiento.class);
           startService(intent);
       }
-
-
     }
 
     public void onCLickCaidaSi(View view){

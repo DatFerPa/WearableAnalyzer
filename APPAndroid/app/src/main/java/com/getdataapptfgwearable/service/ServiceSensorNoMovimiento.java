@@ -3,25 +3,16 @@ package com.getdataapptfgwearable.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
-
-import org.tensorflow.lite.Interpreter;
-
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,21 +22,11 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
     private int contador;
     private double[] gravity = new double[3];
     private float[] linear_acceleration = new float[3];
-
     List<float[]> lst_linear_acc = new ArrayList<>();
-    //Sensores
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
-    private String stringprueba1 =  "1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1:1.1;1.1;1.1";
-    private float[][] floatpruebaSiCaida ={{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f},{1.1f,1.1f,1.1f}};
-    private float[][] floatpruebaNoCaida ={{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f}};
-
-
-
-
-    public ServiceSensorNoMovimiento() {
-    }
+    public ServiceSensorNoMovimiento() { }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -53,12 +34,11 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        contador = 1;
+        contador = 0;
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         return super.onStartCommand(intent, flags, startId);
     }
@@ -66,8 +46,7 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
     @Override
     public void onSensorChanged(SensorEvent sensor) {
         double alpha = 0.8;
-
-        if (contador >= 100) {
+        if (contador >= 1000) {
             contador = 0;
             Log.d(TAG,"---------------------------------- SE HAN HECHO 1000 LECTURAS DE NO MOVIMIENTO");
             crearFicheroCaidaNo();
