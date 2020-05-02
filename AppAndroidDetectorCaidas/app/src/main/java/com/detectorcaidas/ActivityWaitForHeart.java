@@ -15,6 +15,10 @@ import android.widget.Toast;
 
 import com.detectorcaidas.services.ServiceFallingSensor;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import androidx.core.content.res.ResourcesCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -46,6 +50,12 @@ public class ActivityWaitForHeart extends WearableActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
+        Date date = new Date();
+
+        MainActivity.textoLogsTurno += "Empezando el turno con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date) +" ;";
         isWaitingForHeart = true;
         setContentView(R.layout.layout_activity_wait_for_heart);
         IntentFilter filter = new IntentFilter();
@@ -65,6 +75,7 @@ public class ActivityWaitForHeart extends WearableActivity {
         Log.d(TAG,"on pause");
         if(ActivityWaitForHeart.isWaitingForHeart){
             Log.d(TAG,"salimos de waiting heart mientras el service estaba activo");
+            MainActivity.textoLogsTurno = "";
             stopService(MainActivity.intentService);
             isWaitingForHeart=false;
             MainActivity.isTurnoEmpezado = false;

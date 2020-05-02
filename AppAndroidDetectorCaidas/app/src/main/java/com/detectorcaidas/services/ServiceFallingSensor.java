@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.BitmapFactory;
@@ -19,15 +20,31 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.ActivityWaitForHeart;
 import com.detectorcaidas.MainActivity;
 import com.detectorcaidas.R;
+
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
@@ -120,9 +137,15 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 boolean esCaida = salida[0][0] >= salida[0][1]?true:false;
 
                 if(false){
-                    Log.d(TAG,"Si me he caido");
+                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
+                    Date date = new Date();
+                    MainActivity.textoLogsTurno += "Detectada falta de movimiento, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date);
+                    Log.d(TAG,"Falta de movimineto detectada");
                     if(rateHeartNormal()==false){
                         Log.d(TAG,"Caida detectada con latidos fuera de lo normal");
+                        MainActivity.textoLogsTurno += "Detectada falta de movimiento con pulsaciones por fuera de lo normal, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date)+";";
+
                         MainActivity.caidaBool = true;
 
                         //Broadcast movida
@@ -185,6 +208,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                             LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
                         }
                         tiempoHastaLlamada.start();
+                    }else{
+                        MainActivity.textoLogsTurno += "Las pulsaciones han sido normales, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date)+";";
+
                     }
                 }else{
                     Log.d(TAG,"No me he caido");
@@ -268,6 +294,12 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         }else{
             Toast.makeText(getApplicationContext(),"No se ha podido realizar la llamada",Toast.LENGTH_LONG).show();
         }
+
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
+        Date date = new Date();
+        MainActivity.textoLogsTurno += "Finalizando el turno por una emergencia, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date);
+        crearFicheroLogs();
         MainActivity.isTurnoEmpezado = false;
         Intent intent1 = new Intent();
         intent1.setAction("com.detectorcaidas");
@@ -275,6 +307,85 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
     }
 
+    private void crearFicheroLogs(){
+
+
+        String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG,response);
+                        if("turnoFalseAdd".equals(response)){
+                            Log.d(TAG,"guardando el fichero de logs");
+                            try{
+                                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
+                                String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista),getString(R.string.shared_maquinista_por_defecto));
+                                String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno),getString(R.string.shared_maquinista_por_defecto));
+                                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
+                                Date date = new Date();
+                                File fichero = new File(getApplicationContext().getFilesDir(),nombremaquinista+" "+nombreturno+", "+dateFormat.format(date)+" "+hourFormat.format(date)+".txt");
+                                BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
+                                String[] texto_split = MainActivity.textoLogsTurno.split(";");
+                                for (String fila :texto_split) {
+                                    writer.write(fila+"\n");
+                                }
+                                writer.close();
+                            }catch (IOException e){
+                                Log.e(TAG,e.getMessage());
+                            }
+                        }
+                        MainActivity.textoLogsTurno = "";
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"Fallo al subir el fichero de Logs",Toast.LENGTH_LONG).show();
+                Log.d(TAG,"guardando el fichero de logs");
+                try {
+                    SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES), Context.MODE_PRIVATE);
+                    String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista), getString(R.string.shared_maquinista_por_defecto));
+                    String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno), getString(R.string.shared_maquinista_por_defecto));
+                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
+                    Date date = new Date();
+                    File fichero = new File(getApplicationContext().getFilesDir(), nombremaquinista + " " + nombreturno + ", " + dateFormat.format(date) + " " + hourFormat.format(date) + ".txt");
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
+                    String[] texto_split = MainActivity.textoLogsTurno.split(";");
+                    for (String fila : texto_split) {
+                        writer.write(fila + "\n");
+                    }
+                    writer.close();
+                }catch (IOException e){
+                    Log.e(TAG,e.getMessage());
+                }
+                MainActivity.textoLogsTurno = "";
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String>  params = new HashMap<String, String>();
+
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
+                Date date = new Date();
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
+                String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista),getString(R.string.shared_maquinista_por_defecto));
+                String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno),getString(R.string.shared_maquinista_por_defecto));
+                params.put("nombreMaquinista",nombremaquinista);
+                params.put("nombreTurno",nombreturno);
+                params.put("fecha",dateFormat.format(date));
+                params.put("hora",hourFormat.format(date));
+                params.put("contenido",MainActivity.textoLogsTurno);
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
+
+    }
 
 
 }

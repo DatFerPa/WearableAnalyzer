@@ -22,6 +22,11 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.detectorcaidas.services.ServiceFallingSensor;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -44,6 +49,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private View layoutInicio;
     private View layoutTurno;
     private View layoutLogout;
+
+    public static String textoLogsTurno;
 
     public static Intent intentService;
 
@@ -181,6 +188,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     public void clickButtonInicio(View view) {
         if(isTurnoEmpezado && caidaBool){
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
+            Date date = new Date();
+            MainActivity.textoLogsTurno += "Se evitado el frenado de emergencia, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date)+";";
             MainActivity.intentService = new Intent(this, ServiceFallingSensor.class);
             startService(MainActivity.intentService);
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
@@ -202,6 +213,11 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             stopService(intentService);
             isTurnoEmpezado = false;
             botonTurno.setText(R.string.empezar_turno);
+
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
+            Date date = new Date();
+            MainActivity.textoLogsTurno += "Turno finalizado con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date);
         }
     }
 

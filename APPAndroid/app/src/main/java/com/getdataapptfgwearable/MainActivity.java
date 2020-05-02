@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -24,6 +25,9 @@ import com.getdataapptfgwearable.service.ServiceSensorNoMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorSiMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorHeart;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,8 +91,13 @@ public class MainActivity extends WearableActivity  {
     }
 
     public void onCLickCaidaSi(View view){
+/*
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        Date date = new Date();
+        Log.d(TAG,dateFormat.format(date));
+*/
 
-
+/*
         if(activo){
             activo = false;
             Log.d(TAG,"Finalizando la lectura de datos si caida");
@@ -101,6 +110,44 @@ public class MainActivity extends WearableActivity  {
             intent = new Intent(this, ServiceSensorSiMovimiento.class);
             startService(intent);
         }
+ */
+
+
+        String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG,response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"Fallo en el servidor. Intentelo más tarde",Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String>  params = new HashMap<String, String>();
+
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
+                Date date = new Date();
+
+                params.put("nombreMaquinista","Fer");
+                params.put("nombreTurno","turno dia");
+                params.put("fecha",dateFormat.format(date));
+                params.put("hora",hourFormat.format(date));
+                params.put("contenido","Se ha empezado el turno ;Log de ejmplo 1 ;Log de ejemplo2 :Final del turno");
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
+
 
     }
 
