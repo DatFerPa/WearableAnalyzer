@@ -21,11 +21,23 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.services.ServiceFallingSensor;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
@@ -199,7 +211,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             Toast.makeText(getApplicationContext(),"Cancelando frenos de emergencia",Toast.LENGTH_LONG).show();
         }
     }
-
 
     public void clickButtonTurno(View view){
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
