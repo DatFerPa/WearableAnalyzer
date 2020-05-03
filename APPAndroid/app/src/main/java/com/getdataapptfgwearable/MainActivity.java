@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.Toast;
 import com.getdataapptfgwearable.service.ServiceSensorNoMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorSiMovimiento;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -70,13 +69,17 @@ public class MainActivity extends WearableActivity  {
     public void onClickCaidaNo(View view) {
 
       if(activo){
+          Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
+          crearFichero("movimientono");
           Log.d(TAG,"Finalizando la lectura de datos no caida");
           activo = false;
           botonSi.setVisibility(View.VISIBLE);
           stopService(intent);
-          crearFichero("movimientono");
+          Toast.makeText(getApplicationContext(),"click 2", Toast.LENGTH_LONG).show();
+
       }else{
           Log.d(TAG,"Empezando la lectura de datos no caida");
+          Toast.makeText(getApplicationContext(),"lectura", Toast.LENGTH_LONG).show();
           activo=true;
           botonSi.setVisibility(View.INVISIBLE);
           intent = new Intent(this, ServiceSensorNoMovimiento.class);
@@ -87,17 +90,24 @@ public class MainActivity extends WearableActivity  {
     public void onCLickCaidaSi(View view){
 
         if(activo){
+            Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
+            crearFichero("movimientosi");
             activo = false;
             Log.d(TAG,"Finalizando la lectura de datos si caida");
             botonNo.setVisibility(View.VISIBLE);
             stopService(intent);
-            crearFichero("movimientosi");
+            Toast.makeText(getApplicationContext(),"click 2", Toast.LENGTH_LONG).show();
+
         }else{
             Log.d(TAG,"Empezando la lectura de datos si caida");
+            Toast.makeText(getApplicationContext(),"lectura", Toast.LENGTH_LONG).show();
             activo = true;
             botonNo.setVisibility(View.INVISIBLE);
             intent = new Intent(this, ServiceSensorSiMovimiento.class);
+            Toast.makeText(getApplicationContext(),"click foreground", Toast.LENGTH_LONG).show();
+            Log.d(TAG,"click foreground");
             startService(intent);
+
         }
     }
 
@@ -117,5 +127,6 @@ public class MainActivity extends WearableActivity  {
                 e.printStackTrace();
             }
         }
+        listaDeListas = new ArrayList<>();
     }
 }

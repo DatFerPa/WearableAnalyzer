@@ -17,6 +17,7 @@ import android.hardware.SensorManager;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -79,6 +80,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     //Tensorflow lite
     Interpreter interpreter;
 
+    //Control de CPU
+    PowerManager.WakeLock wakeLock;
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -87,6 +91,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"GetDataAppTFGWereable:WakeLockNoMovimiento");
+        wakeLock.acquire();
         //Crear el interpreter
         try{
             AssetFileDescriptor fileDescriptor = getApplication().getAssets().openFd("converted_model.tflite");
@@ -105,7 +112,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
         //Crear el sensor del acelerómetro
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 
         //Crear el sensor del ratio del corazón
         sensorHeart = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE);
@@ -136,7 +143,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 contadorActualAccel = 0;
                 boolean esCaida = salida[0][0] >= salida[0][1]?true:false;
 
-                if(false){
+                if(true){
                     DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                     DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
                     Date date = new Date();
@@ -280,6 +287,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     public void onDestroy() {
         Log.d(TAG,"Finalizando servicio de deteccion de caidas");
         sensorManager.unregisterListener(this);
+        wakeLock.release();
         super.onDestroy();
     }
 

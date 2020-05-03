@@ -8,6 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,6 +31,10 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
     private SensorManager sensorManager;
     private Sensor accelerometer;
 
+
+    //Control de CPU
+    PowerManager.WakeLock wakeLock;
+
     public ServiceSensorSiMovimiento() {}
 
     @Override
@@ -40,10 +45,13 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"GetDataAppTFGWereable:WakeLockNoMovimiento");
+        wakeLock.acquire();
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         contador = 0;
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -72,8 +80,26 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
 
     @Override
     public void onDestroy() {
+        Toast.makeText(getApplicationContext(),"onDestroy service",Toast.LENGTH_LONG).show();
         Log.d(TAG,"Finalizando servicio movimiento si");
         sensorManager.unregisterListener(this);
+        wakeLock.release();
         super.onDestroy();
+    }
+
+    private void crearFicheroCaidaSi() {
+        Log.d(TAG,String.valueOf(lst_linear_acc.size()));
+        Log.d(TAG,getApplicationContext().getFilesDir().getPath());
+        File fichero = new File(getApplicationContext().getFilesDir(),"movimientosi"+System.currentTimeMillis()+".txt");
+        Log.d(TAG,"Guardando fichero de Si Movimiento");
+        try{
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
+            for (float[] a : lst_linear_acc) {
+                writer.write(a[0] + ";" + a[1] + ";" + a[2] + "\n");
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
