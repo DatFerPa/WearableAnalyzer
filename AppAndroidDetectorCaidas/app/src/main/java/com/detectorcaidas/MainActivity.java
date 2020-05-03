@@ -197,7 +197,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }
     }
 
-
     public void clickButtonInicio(View view) {
         if(isTurnoEmpezado && caidaBool){
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -245,9 +244,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
-
-
-
 
     private final class NavigationAdapter extends WearableNavigationDrawerAdapter {
 

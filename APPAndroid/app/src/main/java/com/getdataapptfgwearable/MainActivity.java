@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -14,23 +13,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.getdataapptfgwearable.service.ServiceSensorNoMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorSiMovimiento;
-import com.getdataapptfgwearable.service.ServiceSensorHeart;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends WearableActivity  {
 
@@ -38,7 +29,8 @@ public class MainActivity extends WearableActivity  {
     private boolean activo;
     private Button botonSi;
     private Button botonNo;
-    private Intent intent;
+    public static Intent intent;
+    public static List<List<float[]>> listaDeListas;
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -62,6 +54,7 @@ public class MainActivity extends WearableActivity  {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.getdataapptfgwearable");
         registerReceiver(broadcastReceiver,intentFilter);
+        listaDeListas = new ArrayList<>();
     }
 
     @Override
@@ -81,6 +74,7 @@ public class MainActivity extends WearableActivity  {
           activo = false;
           botonSi.setVisibility(View.VISIBLE);
           stopService(intent);
+          crearFichero("movimientono");
       }else{
           Log.d(TAG,"Empezando la lectura de datos no caida");
           activo=true;
@@ -91,18 +85,13 @@ public class MainActivity extends WearableActivity  {
     }
 
     public void onCLickCaidaSi(View view){
-/*
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        Date date = new Date();
-        Log.d(TAG,dateFormat.format(date));
-*/
 
-/*
         if(activo){
             activo = false;
             Log.d(TAG,"Finalizando la lectura de datos si caida");
             botonNo.setVisibility(View.VISIBLE);
             stopService(intent);
+            crearFichero("movimientosi");
         }else{
             Log.d(TAG,"Empezando la lectura de datos si caida");
             activo = true;
@@ -110,45 +99,23 @@ public class MainActivity extends WearableActivity  {
             intent = new Intent(this, ServiceSensorSiMovimiento.class);
             startService(intent);
         }
- */
-
-
-        String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG,response);
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"Fallo en el servidor. Intentelo más tarde",Toast.LENGTH_LONG).show();
-                finish();
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams(){
-                Map<String, String>  params = new HashMap<String, String>();
-
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
-                Date date = new Date();
-
-                params.put("nombreMaquinista","Fer");
-                params.put("nombreTurno","turno dia");
-                params.put("fecha",dateFormat.format(date));
-                params.put("hora",hourFormat.format(date));
-                params.put("contenido","Se ha empezado el turno ;Log de ejmplo 1 ;Log de ejemplo2 :Final del turno");
-                return params;
-            }
-        };
-
-        queue.add(stringRequest);
-
-
     }
 
+    private void crearFichero(String nombre){
+        for(List<float[]> lista:listaDeListas){
+            Log.d(TAG, String.valueOf(lista.size()));
+            Log.d(TAG, getApplicationContext().getFilesDir().getPath());
+            File fichero = new File(getApplicationContext().getFilesDir(), nombre + System.currentTimeMillis() + ".txt");
+            Log.d(TAG, "Guardando fichero de "+nombre);
+            try {
+                BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
+                for (float[] a : lista) {
+                    writer.write(a[0] + ";" + a[1] + ";" + a[2] + "\n");
+                }
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

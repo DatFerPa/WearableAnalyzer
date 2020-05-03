@@ -9,6 +9,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.getdataapptfgwearable.MainActivity;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -38,8 +42,8 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
     public int onStartCommand(Intent intent, int flags, int startId) {
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         contador = 0;
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -49,7 +53,7 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
         if(contador>=1000){
             contador = 0;
             Log.d(TAG,"---------------------------------- SE HAN HECHO 1000 LECTURAS DE SI MOVIMIENTO");
-            crearFicheroCaidaSi();
+            MainActivity.listaDeListas.add(lst_linear_acc);
             lst_linear_acc = new ArrayList<>();
         }
         gravity[0] = alpha * gravity[0] + (1 - alpha) * sensor.values[0];
@@ -58,7 +62,7 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
         linear_acceleration[0] = (float) (sensor.values[0] - gravity[0]);
         linear_acceleration[1] = (float) (sensor.values[1] - gravity[1]);
         linear_acceleration[2] = (float) (sensor.values[2] - gravity[2]);
-        Log.d(TAG, "Datos del accelerometro: "+ contador+": " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
+        Log.d(TAG, contador+" - "+"Datos del accelerometro: X: " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
         lst_linear_acc.add(linear_acceleration.clone());
         contador++;
     }
@@ -66,28 +70,10 @@ public class ServiceSensorSiMovimiento extends Service implements SensorEventLis
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) { }
 
-
-
     @Override
     public void onDestroy() {
         Log.d(TAG,"Finalizando servicio movimiento si");
         sensorManager.unregisterListener(this);
         super.onDestroy();
-    }
-
-    private void crearFicheroCaidaSi() {
-        Log.d(TAG,String.valueOf(lst_linear_acc.size()));
-        Log.d(TAG,getApplicationContext().getFilesDir().getPath());
-        File fichero = new File(getApplicationContext().getFilesDir(),"movimientosi"+System.currentTimeMillis()+".txt");
-        Log.d(TAG,"Guardando fichero de Si Movimiento");
-        try{
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-            for (float[] a : lst_linear_acc) {
-                writer.write(a[0] + ";" + a[1] + ";" + a[2] + "\n");
-            }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

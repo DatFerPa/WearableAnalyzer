@@ -9,6 +9,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.getdataapptfgwearable.MainActivity;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -49,7 +53,7 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
         if (contador >= 1000) {
             contador = 0;
             Log.d(TAG,"---------------------------------- SE HAN HECHO 1000 LECTURAS DE NO MOVIMIENTO");
-            crearFicheroCaidaNo();
+            MainActivity.listaDeListas.add(lst_linear_acc);
             lst_linear_acc = new ArrayList<>();
         }
         gravity[0] = alpha * gravity[0] + (1 - alpha) * sensor.values[0];
@@ -72,24 +76,4 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
         sensorManager.unregisterListener(this);
         super.onDestroy();
     }
-
-    private void crearFicheroCaidaNo() {
-
-        Log.d(TAG, String.valueOf(lst_linear_acc.size()));
-
-        Log.d(TAG, getApplicationContext().getFilesDir().getPath());
-
-        File fichero = new File(getApplicationContext().getFilesDir(), "movimmientono" + System.currentTimeMillis() + ".txt");
-        Log.d(TAG, "Guardando fichero de No Movimiento");
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-            for (float[] a : lst_linear_acc) {
-                writer.write(a[0] + ";" + a[1] + ";" + a[2] + "\n");
-            }
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 }
