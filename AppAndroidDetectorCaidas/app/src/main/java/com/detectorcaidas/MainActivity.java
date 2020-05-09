@@ -20,7 +20,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -28,7 +27,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.services.ServiceFallingSensor;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -38,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -62,7 +59,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     private View layoutTurno;
     private View layoutLogout;
 
-    public static String textoLogsTurno;
+    public static StringBuffer textoLogsTurno;
 
     public static Intent intentService;
 
@@ -77,7 +74,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             }
             if("finalizar".equals(intent.getStringExtra("data"))){
                 botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
-                botonTurno.setText(R.string.finalizar_turno);
+                botonTurno.setText(R.string.empezar_turno);
             }
         }
     }
@@ -102,9 +99,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(notificationChannel);
         }
-
-
-
+        textoLogsTurno = new StringBuffer();
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.detectorcaidas");
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(broadcastReceiver, filter);
@@ -202,8 +197,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
             Date date = new Date();
-            MainActivity.textoLogsTurno += "Se evitado el frenado de emergencia, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date)+";";
-            MainActivity.intentService = new Intent(this, ServiceFallingSensor.class);
+            textoLogsTurno.append( "Se evitado el frenado de emergencia, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date)+";");
+            intentService = new Intent(this, ServiceFallingSensor.class);
             startService(MainActivity.intentService);
             botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.seat_icon,null));
             caidaBool = false;
@@ -223,14 +218,13 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             stopService(intentService);
             isTurnoEmpezado = false;
             botonTurno.setText(R.string.empezar_turno);
-
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
             Date date = new Date();
-            MainActivity.textoLogsTurno += "Turno finalizado con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date);
+            textoLogsTurno.append( "Turno finalizado con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date));
+            crearFicheroLogs();
         }
     }
-
 
     public void clickButtonLogout(View view){
         //borrar shared preferences y devolver a la activity de login
@@ -300,5 +294,90 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
+
+
+
+
+    private void crearFicheroLogs(){
+        String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG,response);
+                        if("turnoFalseAdd".equals(response)){
+                            Log.d(TAG,"guardando el fichero de logs");
+                            try{
+                                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
+                                String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista),getString(R.string.shared_maquinista_por_defecto));
+                                String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno),getString(R.string.shared_maquinista_por_defecto));
+                                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
+                                Date date = new Date();
+                                File fichero = new File(getApplicationContext().getFilesDir(),nombremaquinista+" "+nombreturno+", "+dateFormat.format(date)+" "+hourFormat.format(date)+".txt");
+                                BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
+                                String[] texto_split = textoLogsTurno.toString().split(";");
+                                for (String fila :texto_split) {
+                                    writer.write(fila+"\n");
+                                }
+                                writer.close();
+                            }catch (IOException e){
+                                Log.e(TAG,e.getMessage());
+                            }
+                        }
+                        textoLogsTurno.delete(0,-1);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getApplicationContext(),"Fallo al subir el fichero de Logs",Toast.LENGTH_LONG).show();
+                Log.d(TAG,"guardando el fichero de logs");
+                try {
+                    SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES), Context.MODE_PRIVATE);
+                    String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista), getString(R.string.shared_maquinista_por_defecto));
+                    String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno), getString(R.string.shared_maquinista_por_defecto));
+                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                    DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
+                    Date date = new Date();
+                    File fichero = new File(getApplicationContext().getFilesDir(), nombremaquinista + " " + nombreturno + ", " + dateFormat.format(date) + " " + hourFormat.format(date) + ".txt");
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
+                    String[] texto_split = textoLogsTurno.toString().split(";");
+                    for (String fila : texto_split) {
+                        writer.write(fila + "\n");
+                    }
+                    writer.close();
+                }catch (IOException e){
+                    Log.e(TAG,e.getMessage());
+                }
+                textoLogsTurno.delete(0,-1);
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String>  params = new HashMap<String, String>();
+
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
+                Date date = new Date();
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
+                String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista),getString(R.string.shared_maquinista_por_defecto));
+                String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno),getString(R.string.shared_maquinista_por_defecto));
+                params.put("nombreMaquinista",nombremaquinista);
+                params.put("nombreTurno",nombreturno);
+                params.put("fecha",dateFormat.format(date));
+                params.put("hora",hourFormat.format(date));
+                params.put("contenido",textoLogsTurno.toString());
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
+
+    }
+
+
+
+
 }
 

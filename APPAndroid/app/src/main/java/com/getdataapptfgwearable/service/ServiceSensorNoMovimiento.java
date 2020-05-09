@@ -3,6 +3,7 @@ package com.getdataapptfgwearable.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,10 +13,16 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 import com.getdataapptfgwearable.MainActivity;
+
+import org.tensorflow.lite.Interpreter;
+
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +39,7 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
     //Control de CPU
     PowerManager.WakeLock wakeLock;
 
+    Interpreter interpreter;
 
 
 
@@ -52,6 +60,18 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         contador = 0;
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+
+
+        try{
+            AssetFileDescriptor fileDescriptor = getApplication().getAssets().openFd("converted_model.tflite");
+            FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+            FileChannel fileChannel = inputStream.getChannel();
+            MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY,fileDescriptor.getStartOffset(),fileDescriptor.getDeclaredLength());
+            interpreter = new Interpreter(mappedByteBuffer);
+        }catch(IOException e){
+            Log.e(TAG,e.getMessage());
+        }
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -63,6 +83,19 @@ public class ServiceSensorNoMovimiento extends Service implements SensorEventLis
             Log.d(TAG,"---------------------------------- SE HAN HECHO 1000 LECTURAS DE NO MOVIMIENTO");
             MainActivity.listaDeListas.add(lst_linear_acc);
             //crearFicheroCaidaNo();
+
+            float[][] salida = new float[1][2];
+            float[][] entrada = new float[1000][];
+
+            int cont = 0;
+            for(float[] bloque:lst_linear_acc){
+                entrada[cont]=bloque;
+                cont++;
+            }
+            interpreter.run(entrada,salida);
+            Log.d(TAG,"Salida:  Si movimiento: "+salida[0][0]+" --  no movimiento: "+salida[0][1]);
+
+
             lst_linear_acc = new ArrayList<>();
         }
         gravity[0] = alpha * gravity[0] + (1 - alpha) * sensor.values[0];

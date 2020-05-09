@@ -6,7 +6,7 @@ import tensorflow as tf
 
 DATADIR = "D:\Git\WearableAnalyzer\TensorDetector"
 
-CATEGORIES = ["simovimineto","nomovimiento"]
+CATEGORIES = ["simovimiento","nomovimiento"]
 training_data = []
 
 for category in CATEGORIES:
@@ -23,7 +23,7 @@ for category in CATEGORIES:
             array_caidas = []
             for x in f1:
                 lista = list(map(float,x.split(";")))
-                print(lista)
+                #print(lista)
                 array_caidas.append(lista)
             #print(array_caidas)
             training_data.append([array_caidas,caida_tipo])

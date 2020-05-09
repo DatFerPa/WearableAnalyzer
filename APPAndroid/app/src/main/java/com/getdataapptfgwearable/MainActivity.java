@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.getdataapptfgwearable.service.ServiceSensorHeart;
 import com.getdataapptfgwearable.service.ServiceSensorNoMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorSiMovimiento;
 import java.io.BufferedWriter;
@@ -66,19 +68,18 @@ public class MainActivity extends WearableActivity  {
         super.onPause();
     }
 
-    public void onClickCaidaNo(View view) {
-
+    public void onClickNoMovimiento(View view) {
       if(activo){
           Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
           crearFichero("movimientono");
-          Log.d(TAG,"Finalizando la lectura de datos no caida");
+          Log.d(TAG,"Finalizando la lectura de datos no movimiento");
           activo = false;
           botonSi.setVisibility(View.VISIBLE);
           stopService(intent);
           Toast.makeText(getApplicationContext(),"click 2", Toast.LENGTH_LONG).show();
 
       }else{
-          Log.d(TAG,"Empezando la lectura de datos no caida");
+          Log.d(TAG,"Empezando la lectura de datos no movimiento");
           Toast.makeText(getApplicationContext(),"lectura", Toast.LENGTH_LONG).show();
           activo=true;
           botonSi.setVisibility(View.INVISIBLE);
@@ -87,19 +88,19 @@ public class MainActivity extends WearableActivity  {
       }
     }
 
-    public void onCLickCaidaSi(View view){
+    public void onCLickSiMovimiento(View view){
 
         if(activo){
             Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
             crearFichero("movimientosi");
             activo = false;
-            Log.d(TAG,"Finalizando la lectura de datos si caida");
+            Log.d(TAG,"Finalizando la lectura de datos si movimiento");
             botonNo.setVisibility(View.VISIBLE);
             stopService(intent);
             Toast.makeText(getApplicationContext(),"click 2", Toast.LENGTH_LONG).show();
 
         }else{
-            Log.d(TAG,"Empezando la lectura de datos si caida");
+            Log.d(TAG,"Empezando la lectura de datos si movimiento");
             Toast.makeText(getApplicationContext(),"lectura", Toast.LENGTH_LONG).show();
             activo = true;
             botonNo.setVisibility(View.INVISIBLE);
@@ -129,4 +130,27 @@ public class MainActivity extends WearableActivity  {
         }
         listaDeListas = new ArrayList<>();
     }
+
+/*
+    //heart
+    public void onClickCaidaNo(View view) {
+        if(activo){
+            Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
+            Log.d(TAG,"Finalizando la lectura de datos no caida");
+            activo = false;
+            botonSi.setVisibility(View.VISIBLE);
+            stopService(intent);
+            Toast.makeText(getApplicationContext(),"click 2", Toast.LENGTH_LONG).show();
+
+        }else{
+            Log.d(TAG,"Empezando la lectura de datos no caida");
+            Toast.makeText(getApplicationContext(),"lectura", Toast.LENGTH_LONG).show();
+            activo=true;
+            botonSi.setVisibility(View.INVISIBLE);
+            intent = new Intent(this, ServiceSensorHeart.class);
+            startService(intent);
+        }
+    }
+
+*/
 }

@@ -55,7 +55,7 @@ public class ActivityWaitForHeart extends WearableActivity {
         DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
         Date date = new Date();
 
-        MainActivity.textoLogsTurno += "Empezando el turno con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date) +" ;";
+        MainActivity.textoLogsTurno.append("Empezando el turno con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date) +" ;");
         isWaitingForHeart = true;
         setContentView(R.layout.layout_activity_wait_for_heart);
         IntentFilter filter = new IntentFilter();
@@ -75,7 +75,7 @@ public class ActivityWaitForHeart extends WearableActivity {
         Log.d(TAG,"on pause");
         if(ActivityWaitForHeart.isWaitingForHeart){
             Log.d(TAG,"salimos de waiting heart mientras el service estaba activo");
-            MainActivity.textoLogsTurno = "";
+            MainActivity.textoLogsTurno.delete(0,-1);
             stopService(MainActivity.intentService);
             isWaitingForHeart=false;
             MainActivity.isTurnoEmpezado = false;
