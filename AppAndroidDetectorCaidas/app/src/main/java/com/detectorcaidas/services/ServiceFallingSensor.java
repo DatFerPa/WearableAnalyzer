@@ -20,7 +20,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -30,7 +29,6 @@ import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.ActivityWaitForHeart;
 import com.detectorcaidas.MainActivity;
 import com.detectorcaidas.R;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,14 +43,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import org.tensorflow.lite.Interpreter;
 
 public class ServiceFallingSensor extends Service implements SensorEventListener {
@@ -74,15 +70,11 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     int contadorActualHeart;
     public final static int ESTAS_FUERA_DE_LA_PRINCIPAL = 1;
     public final static String FUERA = "fueraPrincipal";
-    private String accel_para_enviar = "";
     private CountDownTimer tiempoHastaLlamada;
-    private boolean waitingToResponse;
     //Tensorflow lite
     Interpreter interpreter;
-    private RequestQueue queue ;
     //Control de CPU
     PowerManager.WakeLock wakeLock;
-
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -91,12 +83,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        waitingToResponse = false;
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"GetDataAppTFGWereable:WakeLockNoMovimiento");
         wakeLock.acquire();
-        queue = Volley.newRequestQueue(this);
-        //Crear el interpreter
         try{
             AssetFileDescriptor fileDescriptor = getApplication().getAssets().openFd("converted_model.tflite");
             FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
@@ -128,10 +117,8 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     public void onSensorChanged(SensorEvent sensorEvent) {
         double alpha = 0.8;
         if(sensorEvent.sensor.getType()==Sensor.TYPE_ACCELEROMETER && ActivityWaitForHeart.isWaitingForHeart == false){
-            if(contadorActualAccel >= 1000){ // && waitingToResponse== false
-                waitingToResponse = true;
+            if(contadorActualAccel >= 1000){
                 Log.d(TAG,"Se han hecho 1000 lecturas");
-                //meter un volley request y si hay un problema al conectarse al servidor -> hacer la movida  local
 
                 float[][] salida = new float[1][2];
                 float[][] entrada = new float[1000][];
@@ -144,7 +131,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 Log.d(TAG_MOVIMIENTOS,"Salida:  Si movimiento: "+salida[0][0]+" --  no movimiento: "+salida[0][1]);
                 lst_linear_acc = new ArrayList<>();
                 contadorActualAccel = 0;
-                //accel_para_enviar="";
                 boolean esNoMovimiento = salida[0][0] >= salida[0][1]?false:true;
                 if(esNoMovimiento) {
                     hacerAccionesNoMovimiento();
@@ -152,59 +138,8 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     Log.d(TAG_MOVIMIENTOS,"No se ha detectado falta de movimiento");
                 }
 
-               /*
-
-
-                String url = "https://servidorhombremuerto.herokuapp.com/getIsOk/";
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                lst_linear_acc = new ArrayList<>();
-                                contadorActualAccel = 0;
-                                accel_para_enviar="";
-                                Log.d(TAG,"respuesta fuera");
-                                if("noMovimiento".equals(response)){
-                                    hacerAccionesNoMovimiento();
-                                }
-                            }
-                        }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG,"Fallo en el servidor, utilizando red local");
-
-                        float[][] salida = new float[1][2];
-                        float[][] entrada = new float[1000][];
-                        int cont = 0;
-                        for(float[] bloque:lst_linear_acc){
-                            entrada[cont]=bloque;
-                            cont++;
-                        }
-                        interpreter.run(entrada,salida);
-                        Log.d(TAG_MOVIMIENTOS,"Salida:  Si movimiento: "+salida[0][0]+" --  no movimiento: "+salida[0][1]);
-                        lst_linear_acc = new ArrayList<>();
-                        contadorActualAccel = 0;
-                        accel_para_enviar="";
-                        boolean esNoMovimiento = salida[0][0] >= salida[0][1]?false:true;
-                        if(esNoMovimiento) {
-                            hacerAccionesNoMovimiento();
-                        }else{
-                            Log.d(TAG_MOVIMIENTOS,"No se ha detectado falta de movimiento");
-                        }
-                    }
-                }){
-                    @Override
-                    protected Map<String, String> getParams(){
-                        Map<String, String>  params = new HashMap<String, String>();
-                        Log.d(TAG,"---------------------"+lst_linear_acc.size());
-                        params.put("accel",accel_para_enviar);
-                        return params;
-                    }
-                };
-                queue.add(stringRequest);
-                */
             }else {
-                //if(waitingToResponse== false) {
+
                     gravity[0] = alpha * gravity[0] + (1 - alpha) * sensorEvent.values[0];
                     gravity[1] = alpha * gravity[1] + (1 - alpha) * sensorEvent.values[1];
                     gravity[2] = alpha * gravity[2] + (1 - alpha) * sensorEvent.values[2];
@@ -213,16 +148,8 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     linear_acceleration[1] = (float) (sensorEvent.values[1] - gravity[1]);
                     linear_acceleration[2] = (float) (sensorEvent.values[2] - gravity[2]);
                     Log.d(TAG, "Datos del accelerometro: " + contadorActualAccel + " ---  X: " + linear_acceleration[0] + " - Y: " + linear_acceleration[1] + " - Z: " + linear_acceleration[2]);
-                    /*
-                    if (contadorActualAccel == 0) {
-                        accel_para_enviar = accel_para_enviar + linear_acceleration[0] + ";" + linear_acceleration[1] + ";" + linear_acceleration[2];
-                    } else {
-                        accel_para_enviar = ":" + accel_para_enviar + linear_acceleration[0] + ";" + linear_acceleration[1] + ";" + linear_acceleration[2];
-                    }
-                     */
                     lst_linear_acc.add(linear_acceleration.clone());
                     contadorActualAccel++;
-                //}
             }
 
         }else if(sensorEvent.sensor.getType()==Sensor.TYPE_HEART_RATE){
@@ -379,7 +306,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
 
     private void hacerAccionesNoMovimiento(){
-            waitingToResponse = true;
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
             Date date = new Date();
