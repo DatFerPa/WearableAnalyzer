@@ -326,7 +326,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                                 Log.e(TAG,e.getMessage());
                             }
                         }
-                        textoLogsTurno.delete(0,-1);
+                        textoLogsTurno.delete(0,textoLogsTurno.length());
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -350,7 +350,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                 }catch (IOException e){
                     Log.e(TAG,e.getMessage());
                 }
-                textoLogsTurno.delete(0,-1);
+                textoLogsTurno.delete(0,textoLogsTurno.length());
             }
         }){
             @Override

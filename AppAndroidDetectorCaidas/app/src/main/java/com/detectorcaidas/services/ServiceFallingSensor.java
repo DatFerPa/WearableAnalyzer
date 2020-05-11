@@ -253,7 +253,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                                 Log.e(TAG,e.getMessage());
                             }
                         }
-                        MainActivity.textoLogsTurno.delete(0,-1);
+                        MainActivity.textoLogsTurno.delete(0,MainActivity.textoLogsTurno.length());
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -277,7 +277,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 }catch (IOException e){
                     Log.e(TAG,e.getMessage());
                 }
-                MainActivity.textoLogsTurno.delete(0,-1);
+                MainActivity.textoLogsTurno.delete(0,MainActivity.textoLogsTurno.length());
             }
         }){
             @Override
