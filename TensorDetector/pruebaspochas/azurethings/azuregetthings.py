@@ -8,9 +8,10 @@ account = CloudStorageAccount(STORAGE_ACCOUNT_NAME,STORAGE_ACCOUNT_KEY)
 
 file_service = account.create_file_service()
 
-files = list(file_service.list_directories_and_files('shareficherosmaquinistas'))
+files = list(file_service.list_directories_and_files('shareficherosmaquinistas',prefix="filename"))
 for file in files:
     print(file.name)
     ff = file_service.get_file_to_text('shareficherosmaquinistas',None,file.name)
     print(ff.name)
-    print(ff.content)
+    print(ff.content.split('\n'))
+    print("--------------------")
