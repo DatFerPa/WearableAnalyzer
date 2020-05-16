@@ -204,7 +204,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
     private void makeCallAndBrake(){
         Log.d(TAG, "Activando los frenos");
         Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:648738746"));
+        callIntent.setData(Uri.parse("tel:"+R.string.telefono_emergencia));
 
         if (ContextCompat.checkSelfPermission(getApplicationContext(),
             Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {

@@ -23,7 +23,6 @@
     <string name="introducir_nombre_login">Nombre de inicio</string>
 
     <string name="contactoDefecto">Fernando</string>
-    <string name="telefonoDefecto">648738746</string>
     <string name="notsupportsms">No se ha podido enviar un sms. Reloj no soporta SMS</string>
     <string name="title_activity_cancell_call">ActivityCancellCall</string>
     <string name="pregunta_llamar_igualmente">¿Desea realizar la llamada de emergia igualmente?</string>
@@ -40,5 +39,6 @@
     <string name="shared_maquinista_por_defecto">Error</string>
     <string name="title_activity_wait_for_heart">ActivityWaitForHeart</string>
     <string name="text_wait_4_heart">Espere hasta que la aplicación mida sus pulsaciones</string>
+    <string name="telefono_emergencia">648738746</string>
 
 </resources>
