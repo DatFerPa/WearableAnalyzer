@@ -303,8 +303,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
     }
 
-
-
     private void hacerAccionesNoMovimiento(){
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");

@@ -166,8 +166,9 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         if (ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
                         != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this,Manifest.permission.BODY_SENSORS)
-                != PackageManager.PERMISSION_GRANTED) {
-            String[] permisos = {Manifest.permission.READ_PHONE_STATE,Manifest.permission.BODY_SENSORS};
+                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)
+                != PackageManager.PERMISSION_GRANTED ) {
+            String[] permisos = {Manifest.permission.READ_PHONE_STATE,Manifest.permission.CALL_PHONE,Manifest.permission.BODY_SENSORS};
             requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
         }
     }
@@ -207,12 +208,18 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
     public void clickButtonTurno(View view){
-        if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
-                == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this,Manifest.permission.BODY_SENSORS)
-                == PackageManager.PERMISSION_GRANTED && !isTurnoEmpezado ) {
-            Intent intent = new Intent(this, ListTurnoActivity.class);
-            startActivity(intent);
+        if(!isTurnoEmpezado ) {
+            if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
+                    == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(this,Manifest.permission.BODY_SENSORS)
+                    == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(this, ListTurnoActivity.class);
+                startActivity(intent);
+            }else{
+                Toast.makeText(getApplicationContext(),"Acepte los permisos para empezar un tunro", Toast.LENGTH_LONG).show();
+            }
         }else{
             //quitar el service
             stopService(intentService);
