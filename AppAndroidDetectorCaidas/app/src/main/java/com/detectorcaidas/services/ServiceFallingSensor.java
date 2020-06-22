@@ -242,7 +242,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                                 DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
                                 Date date = new Date();
-                                File fichero = new File(getApplicationContext().getFilesDir(),nombremaquinista+" "+nombreturno+", "+dateFormat.format(date)+" "+hourFormat.format(date)+".txt");
+                                File fichero = new File(getApplicationContext().getFilesDir(),nombremaquinista+","+nombreturno+","+dateFormat.format(date)+" "+hourFormat.format(date)+",emergencia.txt");
                                 BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
                                 String[] texto_split = MainActivity.textoLogsTurno.toString().split(";");
                                 for (String fila :texto_split) {
@@ -267,7 +267,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                     DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
                     Date date = new Date();
-                    File fichero = new File(getApplicationContext().getFilesDir(), nombremaquinista + " " + nombreturno + ", " + dateFormat.format(date) + " " + hourFormat.format(date) + ".txt");
+                    File fichero = new File(getApplicationContext().getFilesDir(), nombremaquinista + "," + nombreturno + "," + dateFormat.format(date) + " " + hourFormat.format(date) + ",emergencia.txt");
                     BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
                     String[] texto_split = MainActivity.textoLogsTurno.toString().split(";");
                     for (String fila : texto_split) {
@@ -295,6 +295,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 params.put("fecha",dateFormat.format(date));
                 params.put("hora",hourFormat.format(date));
                 params.put("contenido",MainActivity.textoLogsTurno.toString());
+                params.put("emergencia","emergencia");
                 return params;
             }
         };
@@ -334,7 +335,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                 notificationManagerCompat.notify(NOTIFICATION_ID, notification);
 
                 //cambiar para que el tiempo sea menor
-                tiempoHastaLlamada  = new CountDownTimer(30000, 500) {
+                tiempoHastaLlamada  = new CountDownTimer(15000, 500) {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         Log.d(TAG, "time to finish: " + millisUntilFinished);

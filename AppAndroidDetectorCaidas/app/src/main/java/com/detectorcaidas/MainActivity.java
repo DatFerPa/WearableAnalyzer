@@ -322,7 +322,7 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                                 DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
                                 DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
                                 Date date = new Date();
-                                File fichero = new File(getApplicationContext().getFilesDir(),nombremaquinista+" "+nombreturno+", "+dateFormat.format(date)+" "+hourFormat.format(date)+".txt");
+                                File fichero = new File(getApplicationContext().getFilesDir(),nombremaquinista+","+nombreturno+","+dateFormat.format(date)+" "+hourFormat.format(date)+".txt");
                                 BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
                                 String[] texto_split = textoLogsTurno.toString().split(";");
                                 for (String fila :texto_split) {

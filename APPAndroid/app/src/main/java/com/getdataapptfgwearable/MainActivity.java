@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +15,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.getdataapptfgwearable.service.ServiceSensorHeart;
 import com.getdataapptfgwearable.service.ServiceSensorNoMovimiento;
 import com.getdataapptfgwearable.service.ServiceSensorSiMovimiento;
@@ -21,8 +28,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends WearableActivity  {
 
@@ -32,6 +44,9 @@ public class MainActivity extends WearableActivity  {
     private Button botonNo;
     public static Intent intent;
     public static List<List<float[]>> listaDeListas;
+
+
+    public static Boolean emergencia=false;
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -69,7 +84,11 @@ public class MainActivity extends WearableActivity  {
     }
 
     public void onClickNoMovimiento(View view) {
-      if(activo){
+        emergencia = false;
+        fihceroguapete();
+
+
+      /*if(activo){
           Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
           crearFichero("movimientono");
           Log.d(TAG,"Finalizando la lectura de datos no movimiento");
@@ -85,10 +104,16 @@ public class MainActivity extends WearableActivity  {
           botonSi.setVisibility(View.INVISIBLE);
           intent = new Intent(this, ServiceSensorNoMovimiento.class);
           startService(intent);
-      }
+      }*/
+
+
     }
 
     public void onCLickSiMovimiento(View view){
+
+        emergencia = true;
+        fihceroguapete();
+/*
 
         if(activo){
             Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
@@ -110,7 +135,53 @@ public class MainActivity extends WearableActivity  {
             startService(intent);
 
         }
+        */
+
     }
+
+
+    private void fihceroguapete(){
+        String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG,response);
+                        Toast.makeText(getApplicationContext(),"eipa",Toast.LENGTH_LONG).show();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String>  params = new HashMap<String, String>();
+
+                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
+                Date date = new Date();
+                params.put("nombreMaquinista","Fer");
+                params.put("nombreTurno","turno dia");
+                params.put("fecha",dateFormat.format(date));
+                params.put("hora",hourFormat.format(date));
+                params.put("contenido","movaida \n cosi \n drama on the record");
+                if(emergencia){
+                    params.put("emergencia","emergencia");
+                }
+                return params;
+            }
+        };
+
+        queue.add(stringRequest);
+
+
+
+    }
+
+
+
 
     private void crearFichero(String nombre){
         for(List<float[]> lista:listaDeListas){
