@@ -217,7 +217,8 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
         Date date = new Date();
         MainActivity.textoLogsTurno.append("Finalizando el turno por una emergencia, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date));
-        crearFicheroLogs();
+        //crearFicheroLogs();
+        Intent intent = new Intent();
         MainActivity.isTurnoEmpezado = false;
         Intent intent1 = new Intent();
         intent1.setAction("com.detectorcaidas");
@@ -225,84 +226,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
     }
 
-    private void crearFicheroLogs(){
-        String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG,response);
-                        if("turnoFalseAdd".equals(response)){
-                            Log.d(TAG,"guardando el fichero de logs");
-                            try{
-                                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
-                                String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista),getString(R.string.shared_maquinista_por_defecto));
-                                String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno),getString(R.string.shared_maquinista_por_defecto));
-                                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
-                                Date date = new Date();
-                                File fichero = new File(getApplicationContext().getFilesDir(),nombremaquinista+","+nombreturno+","+dateFormat.format(date)+" "+hourFormat.format(date)+",emergencia.txt");
-                                BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-                                String[] texto_split = MainActivity.textoLogsTurno.toString().split(";");
-                                for (String fila :texto_split) {
-                                    writer.write(fila+"\n");
-                                }
-                                writer.close();
-                            }catch (IOException e){
-                                Log.e(TAG,e.getMessage());
-                            }
-                        }
-                        MainActivity.textoLogsTurno.delete(0,MainActivity.textoLogsTurno.length());
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"Fallo al subir el fichero de Logs",Toast.LENGTH_LONG).show();
-                Log.d(TAG,"guardando el fichero de logs");
-                try {
-                    SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES), Context.MODE_PRIVATE);
-                    String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista), getString(R.string.shared_maquinista_por_defecto));
-                    String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno), getString(R.string.shared_maquinista_por_defecto));
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
-                    Date date = new Date();
-                    File fichero = new File(getApplicationContext().getFilesDir(), nombremaquinista + "," + nombreturno + "," + dateFormat.format(date) + " " + hourFormat.format(date) + ",emergencia.txt");
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-                    String[] texto_split = MainActivity.textoLogsTurno.toString().split(";");
-                    for (String fila : texto_split) {
-                        writer.write(fila + "\n");
-                    }
-                    writer.close();
-                }catch (IOException e){
-                    Log.e(TAG,e.getMessage());
-                }
-                MainActivity.textoLogsTurno.delete(0,MainActivity.textoLogsTurno.length());
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams(){
-                Map<String, String>  params = new HashMap<String, String>();
-
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
-                Date date = new Date();
-                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
-                String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista),getString(R.string.shared_maquinista_por_defecto));
-                String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno),getString(R.string.shared_maquinista_por_defecto));
-                params.put("nombreMaquinista",nombremaquinista);
-                params.put("nombreTurno",nombreturno);
-                params.put("fecha",dateFormat.format(date));
-                params.put("hora",hourFormat.format(date));
-                params.put("contenido",MainActivity.textoLogsTurno.toString());
-                params.put("emergencia","emergencia");
-                return params;
-            }
-        };
-
-        queue.add(stringRequest);
-
-    }
 
     private void hacerAccionesNoMovimiento(){
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -345,7 +268,10 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     public void onFinish() {
                         if (MainActivity.caidaBool) {
                             Log.d(TAG, "Activando frenos");
-                            makeCallAndBrake();
+                            //makeCallAndBrake();
+                            Intent intent = new Intent(getApplicationContext(), ServiceRegistroGenerator.class);
+                            intent.putExtra("emergencia",true);
+                            startService(intent);
                             MainActivity.caidaBool = false;
                         }
                     }

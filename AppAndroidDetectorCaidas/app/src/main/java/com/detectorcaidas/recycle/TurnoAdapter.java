@@ -50,8 +50,6 @@ public class TurnoAdapter extends WearableRecyclerView.Adapter<TurnoAdapter.MyVi
 
     @Override
     public void onBindViewHolder( MyViewHolder holder, int position) {
-        //insertar los textos
-        //holder.textView.setText(contactos.get(position).getNombre());
         holder.textView.setText(turnos.get(position).getNombre()+ "  --  "+turnos.get(position).getTren());
 
     }

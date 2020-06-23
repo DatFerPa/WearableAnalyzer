@@ -27,6 +27,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.services.ServiceFallingSensor;
+import com.detectorcaidas.services.ServiceRegistroGenerator;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -208,6 +210,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
     public void clickButtonTurno(View view){
+
+
         if(!isTurnoEmpezado ) {
             if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
                     == PackageManager.PERMISSION_GRANTED
@@ -229,8 +233,13 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
             Date date = new Date();
             textoLogsTurno.append( "Turno finalizado con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date));
-            crearFicheroLogs();
+            //crearFicheroLogs();
+            Intent intent = new Intent(getApplicationContext(), ServiceRegistroGenerator.class);
+            intent.putExtra("emergencia",true);
+            startService(intent);
         }
+
+
     }
 
     public void clickButtonLogout(View view){
@@ -301,90 +310,5 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(broadcastReceiver);
         super.onDestroy();
     }
-
-
-
-
-    private void crearFicheroLogs(){
-        String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG,response);
-                        if("turnoFalseAdd".equals(response)){
-                            Log.d(TAG,"guardando el fichero de logs");
-                            try{
-                                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
-                                String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista),getString(R.string.shared_maquinista_por_defecto));
-                                String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno),getString(R.string.shared_maquinista_por_defecto));
-                                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
-                                Date date = new Date();
-                                File fichero = new File(getApplicationContext().getFilesDir(),nombremaquinista+","+nombreturno+","+dateFormat.format(date)+" "+hourFormat.format(date)+".txt");
-                                BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-                                String[] texto_split = textoLogsTurno.toString().split(";");
-                                for (String fila :texto_split) {
-                                    writer.write(fila+"\n");
-                                }
-                                writer.close();
-                            }catch (IOException e){
-                                Log.e(TAG,e.getMessage());
-                            }
-                        }
-                        textoLogsTurno.delete(0,textoLogsTurno.length());
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getApplicationContext(),"Fallo al subir el fichero de Logs",Toast.LENGTH_LONG).show();
-                Log.d(TAG,"guardando el fichero de logs");
-                try {
-                    SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES), Context.MODE_PRIVATE);
-                    String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista), getString(R.string.shared_maquinista_por_defecto));
-                    String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno), getString(R.string.shared_maquinista_por_defecto));
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                    DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
-                    Date date = new Date();
-                    File fichero = new File(getApplicationContext().getFilesDir(), nombremaquinista + " " + nombreturno + ", " + dateFormat.format(date) + " " + hourFormat.format(date) + ".txt");
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-                    String[] texto_split = textoLogsTurno.toString().split(";");
-                    for (String fila : texto_split) {
-                        writer.write(fila + "\n");
-                    }
-                    writer.close();
-                }catch (IOException e){
-                    Log.e(TAG,e.getMessage());
-                }
-                textoLogsTurno.delete(0,textoLogsTurno.length());
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams(){
-                Map<String, String>  params = new HashMap<String, String>();
-
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
-                Date date = new Date();
-                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
-                String nombremaquinista = sharedPreferences.getString(getString(R.string.shared_nombre_maquinista),getString(R.string.shared_maquinista_por_defecto));
-                String nombreturno = sharedPreferences.getString(getString(R.string.shared_nombre_turno),getString(R.string.shared_maquinista_por_defecto));
-                params.put("nombreMaquinista",nombremaquinista);
-                params.put("nombreTurno",nombreturno);
-                params.put("fecha",dateFormat.format(date));
-                params.put("hora",hourFormat.format(date));
-                params.put("contenido",textoLogsTurno.toString());
-                return params;
-            }
-        };
-
-        queue.add(stringRequest);
-
-    }
-
-
-
-
 }
 
