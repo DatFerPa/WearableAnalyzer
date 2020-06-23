@@ -225,7 +225,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
                 Toast.makeText(getApplicationContext(),"Acepte los permisos para empezar un tunro", Toast.LENGTH_LONG).show();
             }
         }else{
-            //quitar el service
             stopService(intentService);
             isTurnoEmpezado = false;
             botonTurno.setText(R.string.empezar_turno);
@@ -233,9 +232,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
             Date date = new Date();
             textoLogsTurno.append( "Turno finalizado con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date));
-            //crearFicheroLogs();
             Intent intent = new Intent(getApplicationContext(), ServiceRegistroGenerator.class);
-            intent.putExtra("emergencia",true);
+            intent.putExtra("emergencia",false);
             startService(intent);
         }
 
@@ -243,7 +241,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
     public void clickButtonLogout(View view){
-        //borrar shared preferences y devolver a la activity de login
         Log.d(TAG,"Logout antes de borrar las shared preferences");
         SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -270,7 +267,6 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
         @Override
         public Drawable getItemDrawable(int pos) {
-            //return (pos == 0) ? context.getDrawable(getResources().getIdentifier("walkingicon", "drawable", getPackageName())) : context.getDrawable(getResources().getIdentifier("settings", "drawable", getPackageName()));
             if(pos == 0){
                 return context.getDrawable(getResources().getIdentifier("seat_icon", "drawable", getPackageName()));
             }else if(pos == 1){
