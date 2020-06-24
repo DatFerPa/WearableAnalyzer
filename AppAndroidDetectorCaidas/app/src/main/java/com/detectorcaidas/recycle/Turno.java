@@ -1,7 +1,5 @@
 package com.detectorcaidas.recycle;
 
-import androidx.annotation.NonNull;
-
 public class Turno {
     private String nombre;
     private String tren;

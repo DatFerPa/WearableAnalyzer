@@ -1,38 +1,25 @@
 package com.detectorcaidas.services;
 
-import android.Manifest;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.ActivityWaitForHeart;
 import com.detectorcaidas.MainActivity;
 import com.detectorcaidas.R;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -40,12 +27,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -203,16 +187,6 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
     private void makeCallAndBrake(){
         Log.d(TAG, "Activando los frenos");
-        Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:"+R.string.telefono_emergencia));
-
-        if (ContextCompat.checkSelfPermission(getApplicationContext(),
-            Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
-            startActivity(callIntent);
-        }else{
-            Toast.makeText(getApplicationContext(),"No se ha podido realizar la llamada",Toast.LENGTH_LONG).show();
-        }
-
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
         Date date = new Date();

@@ -6,11 +6,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.wearable.activity.WearableActivity;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.detectorcaidas.services.ServiceFallingSensor;
@@ -19,7 +17,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import androidx.core.content.res.ResourcesCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class ActivityWaitForHeart extends WearableActivity {

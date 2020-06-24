@@ -15,6 +15,6 @@
         android:onClick="clickButtonInicio"
         android:padding="50dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/seat_icon"
+        android:src="@drawable/fallingicon"
         android:visibility="visible" />
 </FrameLayout>

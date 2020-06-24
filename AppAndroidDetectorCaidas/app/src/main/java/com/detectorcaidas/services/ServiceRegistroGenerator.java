@@ -1,16 +1,12 @@
 package com.detectorcaidas.services;
 
-import android.Manifest;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -19,7 +15,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.MainActivity;
 import com.detectorcaidas.R;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -29,9 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 public class ServiceRegistroGenerator extends Service {
     private static final String TAG = "ServiceRegistroGenerator";

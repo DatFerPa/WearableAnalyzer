@@ -20,24 +20,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.detectorcaidas.services.ServiceFallingSensor;
 import com.detectorcaidas.services.ServiceRegistroGenerator;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -168,9 +155,8 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         if (ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
                         != PackageManager.PERMISSION_GRANTED
                 || ContextCompat.checkSelfPermission(this,Manifest.permission.BODY_SENSORS)
-                != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)
                 != PackageManager.PERMISSION_GRANTED ) {
-            String[] permisos = {Manifest.permission.READ_PHONE_STATE,Manifest.permission.CALL_PHONE,Manifest.permission.BODY_SENSORS};
+            String[] permisos = {Manifest.permission.READ_PHONE_STATE,Manifest.permission.BODY_SENSORS};
             requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
         }
     }
@@ -216,13 +202,11 @@ public class MainActivity extends WearableActivity implements WearableNavigation
             if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
                     == PackageManager.PERMISSION_GRANTED
                     && ContextCompat.checkSelfPermission(this,Manifest.permission.BODY_SENSORS)
-                    == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(this,Manifest.permission.CALL_PHONE)
-                            != PackageManager.PERMISSION_GRANTED) {
+                    == PackageManager.PERMISSION_GRANTED) {
                 Intent intent = new Intent(this, ListTurnoActivity.class);
                 startActivity(intent);
             }else{
-                Toast.makeText(getApplicationContext(),"Acepte los permisos para empezar un tunro", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(),"Acepte los permisos para empezar un turno", Toast.LENGTH_LONG).show();
             }
         }else{
             stopService(intentService);
