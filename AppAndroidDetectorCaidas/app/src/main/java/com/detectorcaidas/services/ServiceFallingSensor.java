@@ -218,7 +218,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         Date date = new Date();
         MainActivity.textoLogsTurno.append("Finalizando el turno por una emergencia, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date));
         //crearFicheroLogs();
-        Intent intent = new Intent();
+        Intent intent = new Intent(getApplicationContext(), ServiceRegistroGenerator.class);
+        intent.putExtra("emergencia",true);
+        startService(intent);
         MainActivity.isTurnoEmpezado = false;
         Intent intent1 = new Intent();
         intent1.setAction("com.detectorcaidas");
@@ -268,10 +270,7 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
                     public void onFinish() {
                         if (MainActivity.caidaBool) {
                             Log.d(TAG, "Activando frenos");
-                            //makeCallAndBrake();
-                            Intent intent = new Intent(getApplicationContext(), ServiceRegistroGenerator.class);
-                            intent.putExtra("emergencia",true);
-                            startService(intent);
+                            makeCallAndBrake();
                             MainActivity.caidaBool = false;
                         }
                     }
