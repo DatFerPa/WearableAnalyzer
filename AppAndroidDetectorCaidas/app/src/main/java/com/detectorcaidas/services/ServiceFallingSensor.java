@@ -1,3 +1,7 @@
+/**
+ * @author Fernando Palazuelo Ginzo - UO244588
+ */
+
 package com.detectorcaidas.services;
 
 import android.app.Notification;
@@ -35,6 +39,9 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import org.tensorflow.lite.Interpreter;
 
+/**
+ * Clase encargada de Leer los sensores y actuar en consecuencia de las lecturas
+ */
 public class ServiceFallingSensor extends Service implements SensorEventListener {
     public static final int NOTIFICATION_ID = 101;
     private static final String TAG = "ServiceFallingSensor";
@@ -65,6 +72,13 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         return null;
     }
 
+    /**
+     * Función que se ejecuta al crear el servicio
+     * @param intent
+     * @param flags
+     * @param startId
+     * @return
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
@@ -96,7 +110,10 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         return super.onStartCommand(intent, flags, startId);
     }
 
-
+    /**
+     * Función que se encarga de realizar las lectuaras de los sensores
+     * @param sensorEvent Evento de un sensor del dispositivo
+     */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         double alpha = 0.8;
@@ -157,6 +174,10 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
 
     }
 
+    /**
+     * Función que comprueba si las pulsaciones se encuentran dentro de un rango normal
+     * @return
+     */
     private boolean rateHeartNormal(){
         int cont = 0;
         double media =0;
@@ -185,13 +206,15 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         super.onDestroy();
     }
 
+    /**
+     * Función que se encarga de realizar las acciones necesarias cuando se ha detectado una incidencia
+     */
     private void makeCallAndBrake(){
         Log.d(TAG, "Activando los frenos");
         DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");
         Date date = new Date();
         MainActivity.textoLogsTurno.append("Finalizando el turno por una emergencia, con fecha " + dateFormat.format(date) + " y con hora " + hourFormat.format(date));
-        //crearFicheroLogs();
         Intent intent = new Intent(getApplicationContext(), ServiceRegistroGenerator.class);
         intent.putExtra("emergencia",true);
         startService(intent);
@@ -202,7 +225,9 @@ public class ServiceFallingSensor extends Service implements SensorEventListener
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent1);
     }
 
-
+    /**
+     * Función que se realiza cuando se detecta una falta de movimiento
+     */
     private void hacerAccionesNoMovimiento(){
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             DateFormat hourFormat = new SimpleDateFormat(" HH:mm:ss");

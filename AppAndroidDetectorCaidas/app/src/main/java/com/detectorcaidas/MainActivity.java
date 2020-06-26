@@ -1,3 +1,8 @@
+/**
+ * @author Fernando Palazuelo Ginzo - UO244588
+ */
+
+
 package com.detectorcaidas;
 
 import android.Manifest;
@@ -31,6 +36,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView.WearableNavigationDrawerAdapter;
 import androidx.wear.widget.drawer.WearableNavigationDrawerView;
 
+/**
+ * Activity que se encarga de ofrecer las funciones para el menú principal
+ */
 public class MainActivity extends WearableActivity implements WearableNavigationDrawerView.OnItemSelectedListener {
 
     //notificaciones
@@ -54,8 +62,17 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     public static boolean isTurnoEmpezado;
 
+    /**
+     * Broadcast Receiver que permite comunicar los servicios con la MainActivity
+     */
     public class MyBroadcastReceiver extends BroadcastReceiver {
         private static final String TAG = "MyBroadcastReceiver";
+
+        /**
+         *  Función que se encarga de gestionar las llamadas a los broadcast receivers
+         * @param context Contexto de la aplicación
+         * @param intent Intent que crear la comunicación
+         */
         @Override
         public void onReceive(Context context, Intent intent) {
             if("caida".equals(intent.getStringExtra("data"))) {
@@ -69,7 +86,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
     BroadcastReceiver broadcastReceiver = new MyBroadcastReceiver();
 
-
+    /**
+     * Función que se llama para crear la app
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,13 +135,16 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
 
-
+    /**
+     * Función que prepara el menú cuando se ha detectado una caida
+     */
     private void prepareAppInFall(){
         Log.d(TAG,"prepareAppOnFall");
         botonInicio.setImageDrawable(ResourcesCompat.getDrawable(getResources(),R.drawable.fallingicon,null));
         stopService(intentService);
         onItemSelected(0);
     }
+
 
     @Override
     protected void onStart() {
@@ -151,6 +174,9 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     }
 
+    /**
+     *  Función que se encarga de pedir los permisos al usuario
+     */
     private void pedirPermisos(){
         if (ContextCompat.checkSelfPermission(this,Manifest.permission.READ_PHONE_STATE)
                         != PackageManager.PERMISSION_GRANTED
@@ -162,6 +188,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
     }
 
 
+    /**
+     * Función que nos permite cambiar entre elementos cuando seleccionamos uno en el menú de selección
+     * @param pos Posición del elemento seleccionado en el menú para cambiar entre ventanas
+     */
     @Override
     public void onItemSelected(int pos) {
 
@@ -181,6 +211,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }
     }
 
+    /**
+     * Función que nos permite parar la alarma por falta de movimiento
+     * @param view
+     */
     public void clickButtonInicio(View view) {
         if(isTurnoEmpezado && caidaBool){
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -195,6 +229,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         }
     }
 
+    /**
+     * Función que nos permite empezar y finalizar turnos
+     * @param view
+     */
     public void clickButtonTurno(View view){
 
 
@@ -224,6 +262,10 @@ public class MainActivity extends WearableActivity implements WearableNavigation
 
     }
 
+    /**
+     * Función que nos permite cerrar la sesión como maquinista
+     * @param view
+     */
     public void clickButtonLogout(View view){
         Log.d(TAG,"Logout antes de borrar las shared preferences");
         SharedPreferences sharedPreferences = this.getSharedPreferences(getString(R.string.ID_SHARED_PREFERENCES),Context.MODE_PRIVATE);
@@ -236,6 +278,9 @@ public class MainActivity extends WearableActivity implements WearableNavigation
         startActivity(intent);
     }
 
+    /**
+     * Clase que genera el menú para cambiar entre ventanas
+     */
     private final class NavigationAdapter extends WearableNavigationDrawerAdapter {
 
         private final Context context;

@@ -1,3 +1,7 @@
+/**
+ * @author Fernando Palazuelo Ginzo - UO244588
+ */
+
 package com.detectorcaidas;
 
 import android.content.Context;
@@ -24,6 +28,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.wear.widget.WearableLinearLayoutManager;
 import androidx.wear.widget.WearableRecyclerView;
 
+/**
+ * Activity que muestra los turnos asignados a un maquinista
+ */
 public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.OnclickListenerTurnos{
 
     private static final String TAG = "ListTurnoActivity";
@@ -77,6 +84,10 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
 
     }
 
+    /**
+     * Función que recoge los turnos asignados a un maquinista
+     * @return listado de los Turnos asignados al maquinista
+     */
     private List<Turno> getTurnos() {
         final List<Turno> turnos = new ArrayList<>();
 
@@ -127,10 +138,8 @@ public class ListTurnoActivity extends WearableActivity implements TurnoAdapter.
     }
 
 
-
-
-    /*
-        Deformación circular de la lista
+    /**
+     * Clase que permite la deformación de la lista de los turnos
      */
     public class CustomScrollingLayoutCallbacks extends WearableLinearLayoutManager.LayoutCallback{
         private static final float MAX_ICON_PROGRESS = 0.65f;

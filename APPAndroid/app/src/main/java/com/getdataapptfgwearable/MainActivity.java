@@ -1,3 +1,6 @@
+/**
+ * @author Fernando Palazuelo Ginzo - UO244588
+ */
 package com.getdataapptfgwearable;
 
 import android.Manifest;
@@ -5,7 +8,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -15,44 +17,29 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.getdataapptfgwearable.service.ServiceSensorHeart;
-import com.getdataapptfgwearable.service.ServiceSensorNoMovimiento;
-import com.getdataapptfgwearable.service.ServiceSensorSiMovimiento;
+import com.getdataapptfgwearable.service.ServiceSensorMovimiento;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class MainActivity extends WearableActivity  {
+public class MainActivity extends WearableActivity {
 
     private static final String TAG = "MainActivity";
     private boolean activo;
     private Button botonSi;
     private Button botonNo;
     public static Intent intent;
-    public static List<List<float[]>> listaDeListas;
 
-
-    public static Boolean emergencia=false;
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG,intent.getStringExtra("data"));
-            Toast.makeText(getApplicationContext(),intent.getStringExtra("data"),Toast.LENGTH_LONG).show();
+            Log.d(TAG, intent.getStringExtra("data"));
+            Toast.makeText(getApplicationContext(), intent.getStringExtra("data"), Toast.LENGTH_LONG).show();
         }
     };
 
@@ -61,7 +48,7 @@ public class MainActivity extends WearableActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS)!= PackageManager.PERMISSION_GRANTED){
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BODY_SENSORS) != PackageManager.PERMISSION_GRANTED) {
             String[] permisos = {Manifest.permission.BODY_SENSORS};
             requestPermissions(permisos, PackageManager.PERMISSION_GRANTED);
         }
@@ -69,8 +56,7 @@ public class MainActivity extends WearableActivity  {
         botonNo = (Button) findViewById(R.id.buttonMovimientoNo);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.getdataapptfgwearable");
-        registerReceiver(broadcastReceiver,intentFilter);
-        listaDeListas = new ArrayList<>();
+        registerReceiver(broadcastReceiver, intentFilter);
     }
 
     @Override
@@ -83,145 +69,54 @@ public class MainActivity extends WearableActivity  {
         super.onPause();
     }
 
+    /**
+     * Método encargado de inciar la lectura para crear ficheros con
+     * @param view
+     */
     public void onClickNoMovimiento(View view) {
-        emergencia = false;
-        fihceroguapete();
 
-
-      /*if(activo){
-          Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
-          crearFichero("movimientono");
-          Log.d(TAG,"Finalizando la lectura de datos no movimiento");
-          activo = false;
-          botonSi.setVisibility(View.VISIBLE);
-          stopService(intent);
-          Toast.makeText(getApplicationContext(),"click 2", Toast.LENGTH_LONG).show();
-
-      }else{
-          Log.d(TAG,"Empezando la lectura de datos no movimiento");
-          Toast.makeText(getApplicationContext(),"lectura", Toast.LENGTH_LONG).show();
-          activo=true;
-          botonSi.setVisibility(View.INVISIBLE);
-          intent = new Intent(this, ServiceSensorNoMovimiento.class);
-          startService(intent);
-      }*/
-
-
-    }
-
-    public void onCLickSiMovimiento(View view){
-
-        emergencia = true;
-        fihceroguapete();
-/*
-
-        if(activo){
-            Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
-            crearFichero("movimientosi");
-            activo = false;
-            Log.d(TAG,"Finalizando la lectura de datos si movimiento");
-            botonNo.setVisibility(View.VISIBLE);
-            stopService(intent);
-            Toast.makeText(getApplicationContext(),"click 2", Toast.LENGTH_LONG).show();
-
-        }else{
-            Log.d(TAG,"Empezando la lectura de datos si movimiento");
-            Toast.makeText(getApplicationContext(),"lectura", Toast.LENGTH_LONG).show();
-            activo = true;
-            botonNo.setVisibility(View.INVISIBLE);
-            intent = new Intent(this, ServiceSensorSiMovimiento.class);
-            Toast.makeText(getApplicationContext(),"click foreground", Toast.LENGTH_LONG).show();
-            Log.d(TAG,"click foreground");
-            startService(intent);
-
-        }
-        */
-
-    }
-
-
-    private void fihceroguapete(){
-        String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG,response);
-                        Toast.makeText(getApplicationContext(),"eipa",Toast.LENGTH_LONG).show();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams(){
-                Map<String, String>  params = new HashMap<String, String>();
-
-                DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-                DateFormat hourFormat = new SimpleDateFormat(" HH-mm-ss");
-                Date date = new Date();
-                params.put("nombreMaquinista","Fer");
-                params.put("nombreTurno","turno dia");
-                params.put("fecha",dateFormat.format(date));
-                params.put("hora",hourFormat.format(date));
-                params.put("contenido","movaida \n cosi \n drama on the record");
-                if(emergencia){
-                    params.put("emergencia","emergencia");
-                }
-                return params;
-            }
-        };
-
-        queue.add(stringRequest);
-
-
-
-    }
-
-
-
-
-    private void crearFichero(String nombre){
-        for(List<float[]> lista:listaDeListas){
-            Log.d(TAG, String.valueOf(lista.size()));
-            Log.d(TAG, getApplicationContext().getFilesDir().getPath());
-            File fichero = new File(getApplicationContext().getFilesDir(), nombre + System.currentTimeMillis() + ".txt");
-            Log.d(TAG, "Guardando fichero de "+nombre);
-            try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(fichero));
-                for (float[] a : lista) {
-                    writer.write(a[0] + ";" + a[1] + ";" + a[2] + "\n");
-                }
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        listaDeListas = new ArrayList<>();
-    }
-
-/*
-    //heart
-    public void onClickCaidaNo(View view) {
-        if(activo){
-            Toast.makeText(getApplicationContext(),"click", Toast.LENGTH_LONG).show();
-            Log.d(TAG,"Finalizando la lectura de datos no caida");
+        if (activo) {
+            Toast.makeText(getApplicationContext(), "click", Toast.LENGTH_LONG).show();
+            Log.d(TAG, "Finalizando la lectura de datos no movimiento");
             activo = false;
             botonSi.setVisibility(View.VISIBLE);
             stopService(intent);
-            Toast.makeText(getApplicationContext(),"click 2", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "click 2", Toast.LENGTH_LONG).show();
 
-        }else{
-            Log.d(TAG,"Empezando la lectura de datos no caida");
-            Toast.makeText(getApplicationContext(),"lectura", Toast.LENGTH_LONG).show();
-            activo=true;
+        } else {
+            Log.d(TAG, "Empezando la lectura de datos no movimiento");
+            Toast.makeText(getApplicationContext(), "lectura", Toast.LENGTH_LONG).show();
+            activo = true;
             botonSi.setVisibility(View.INVISIBLE);
-            intent = new Intent(this, ServiceSensorHeart.class);
+            intent = new Intent(this, ServiceSensorMovimiento.class);
+            intent.putExtra("movimiento",false);
             startService(intent);
+
         }
     }
 
-*/
+        public void onCLickSiMovimiento (View view){
+            if (activo) {
+                Toast.makeText(getApplicationContext(), "click", Toast.LENGTH_LONG).show();
+                activo = false;
+                Log.d(TAG, "Finalizando la lectura de datos si movimiento");
+                botonNo.setVisibility(View.VISIBLE);
+                stopService(intent);
+                Toast.makeText(getApplicationContext(), "click 2", Toast.LENGTH_LONG).show();
+
+            } else {
+                Log.d(TAG, "Empezando la lectura de datos si movimiento");
+                Toast.makeText(getApplicationContext(), "lectura", Toast.LENGTH_LONG).show();
+                activo = true;
+                botonNo.setVisibility(View.INVISIBLE);
+                intent = new Intent(this, ServiceSensorMovimiento.class);
+                intent.putExtra("movimiento",true);
+                Toast.makeText(getApplicationContext(), "click foreground", Toast.LENGTH_LONG).show();
+                Log.d(TAG, "click foreground");
+                startService(intent);
+
+            }
+
+
+        }
 }

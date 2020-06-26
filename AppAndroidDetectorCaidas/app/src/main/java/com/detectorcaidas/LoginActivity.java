@@ -1,3 +1,7 @@
+/**
+ * @author Fernando Palazuelo Ginzo - UO244588
+ */
+
 package com.detectorcaidas;
 
 import android.content.Context;
@@ -21,6 +25,9 @@ import com.android.volley.toolbox.Volley;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Actividad que se encarga de gestionar los incios de sesión en la aplicación
+ */
 public class LoginActivity extends WearableActivity {
     private static final String TAG = "LoginActivity";
 
@@ -48,6 +55,10 @@ public class LoginActivity extends WearableActivity {
         }
     }
 
+    /**
+     *  Función que se encarga de identificar un maquinista
+     * @param view
+     */
     public void onClickLogin(View view) {
 
         botonLogin.setClickable(false);

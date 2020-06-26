@@ -1,3 +1,7 @@
+/**
+ * @author Fernando Palazuelo Ginzo - UO244588
+ */
+
 package com.detectorcaidas.services;
 
 import android.app.Service;
@@ -25,6 +29,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Clase que se encarga de crear los registros de los turnos
+ */
 public class ServiceRegistroGenerator extends Service {
     private static final String TAG = "ServiceRegistroGenerator";
     public static boolean emergencia;
@@ -44,7 +51,9 @@ public class ServiceRegistroGenerator extends Service {
         return super.onStartCommand(intent, flags, startId);
     }
 
-
+    /**
+     *  Función que crea el fichero de registro de un turno y lo envia al servidor
+     */
     private void crearFicheroLogs(){
         String url = "https://servidorhombremuerto.herokuapp.com/addLogTurno/";
         RequestQueue queue = Volley.newRequestQueue(this);

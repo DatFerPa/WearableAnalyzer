@@ -16,17 +16,9 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
         <service
-            android:name=".service.ServiceSensorSiMovimiento"
+            android:name=".service.ServiceSensorMovimiento"
             android:enabled="true"
             android:exported="true" />
-        <service
-            android:name=".service.ServiceSensorNoMovimiento"
-            android:enabled="true"
-            android:exported="false" />
-        <service
-            android:name=".service.ServiceSensorHeart"
-            android:enabled="true"
-            android:exported="false" />
 
         <uses-library
             android:name="com.google.android.wearable"

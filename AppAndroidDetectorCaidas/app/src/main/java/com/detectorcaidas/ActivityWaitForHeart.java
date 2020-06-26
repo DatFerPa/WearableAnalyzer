@@ -1,3 +1,7 @@
+/**
+ * @author Fernando Palazuelo Ginzo - UO244588
+ */
+
 package com.detectorcaidas;
 
 import android.content.BroadcastReceiver;
@@ -19,6 +23,10 @@ import java.util.Date;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+/**
+ * Actividad que se encarga de avisar al maquinsita, para que espere a que se le haga una lectura
+ * de las pulsaciones
+ */
 public class ActivityWaitForHeart extends WearableActivity {
 
     private static final String TAG = "ActivityWaitForHeart";
@@ -27,7 +35,10 @@ public class ActivityWaitForHeart extends WearableActivity {
     private ImageView imagenCorazon;
     public static boolean isWaitingForHeart;
 
-
+    /**
+     * Clase que permite la comunicación entre los servicios y la activity ActivityWaitForHeart,
+     * cuando se ha relaizado una lectura de las pulsaciones
+     */
     public class MyBroadcastReceiver extends BroadcastReceiver {
         private static final String TAG = "MyBroadcastReceiver";
         @Override

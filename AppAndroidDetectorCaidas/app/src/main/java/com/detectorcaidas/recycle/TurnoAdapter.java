@@ -1,3 +1,7 @@
+/**
+ * @author Fernando Palazuelo Ginzo - UO244588
+ */
+
 package com.detectorcaidas.recycle;
 
 import android.view.LayoutInflater;
@@ -8,6 +12,9 @@ import com.detectorcaidas.R;
 import java.util.List;
 import androidx.wear.widget.WearableRecyclerView;
 
+/**
+ * Clase que crea el adpater para poder usarlo en el recycler view
+ */
 public class TurnoAdapter extends WearableRecyclerView.Adapter<TurnoAdapter.MyViewHolder> {
     private List<Turno> turnos;
     private OnclickListenerTurnos adapterOnClickListenerTurnos;
