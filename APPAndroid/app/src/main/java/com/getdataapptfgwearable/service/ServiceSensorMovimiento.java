@@ -20,6 +20,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Clase encargada de leer el acelerómetro del dispositvo e ir guardando bloques de datos de 1000 en 1000, para luego guardarlos dentro del sistema
+ */
 public class ServiceSensorMovimiento extends Service implements SensorEventListener {
     private static final String TAG = "ServiceSensorMovimiento";
 
@@ -55,6 +58,10 @@ public class ServiceSensorMovimiento extends Service implements SensorEventListe
         return super.onStartCommand(intent, flags, startId);
     }
 
+    /**
+     * Método que se encarga de realizar cada una de las lecturas de los sensores
+     * @param sensor
+     */
     @Override
     public void onSensorChanged(SensorEvent sensor) {
         double alpha = 0.8;
@@ -87,6 +94,11 @@ public class ServiceSensorMovimiento extends Service implements SensorEventListe
         super.onDestroy();
     }
 
+    /**
+     * Método encargado de crear un fichero en el sistema por cada mil lecturas.
+     * Este método creará un fichero caidasi o caidano, dependiendo del extra que coloquemos
+     * en el Intent al iniciar el Servicio
+     */
     private void crearFichero() {
         Log.d(TAG,String.valueOf(lst_linear_acc.size()));
         Log.d(TAG,getApplicationContext().getFilesDir().getPath());
