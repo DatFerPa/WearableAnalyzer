@@ -47,7 +47,7 @@ public class ServiceSensorMovimiento extends Service implements SensorEventListe
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        caida = intent.getBooleanExtra("caida",false);
+        caida = intent.getBooleanExtra("movimiento",false);
         PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"GetDataAppTFGWereable:WakeLockNoMovimiento");
         wakeLock.acquire();
